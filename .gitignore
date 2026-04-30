@@ -1,0 +1,16 @@
+# LaTeX build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.bbl
+*.blg
+*.toc
+
+# MacOS
+.DS_Store
+
+# Temporary
+*.tmp
+*.swp
