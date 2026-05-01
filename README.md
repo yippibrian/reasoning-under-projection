@@ -1,6 +1,6 @@
 # Reasoning Under Projection
 
-Most reasoning systems fail not because they reason incorrectly, but because they reason over representations that have already lost the distinctions required for valid conclusions.
+Reasoning systems can fail not only because they infer incorrectly, but because they reason over representations that do not preserve the distinctions required for the query being answered.
 
 This repository contains the paper:
 
@@ -10,47 +10,43 @@ This repository contains the paper:
 
 ## Summary
 
-This paper presents a conceptual and structural framework. It does not provide empirical evaluation or implementation-specific results; those are addressed in separate work.
+This paper presents a conceptual and structural framework. It does not provide empirical evaluation, an inference-time intervention, or implementation-specific results; those are addressed in separate work.
 
-Reasoning systems do not operate on full system state. They operate on compressed representations, where distinctions are reduced or eliminated in order to make inference tractable. This compression introduces irreversible information loss.
+Reasoning systems do not operate on full system state. They operate on compressed representations, where distinctions may be reduced or eliminated in order to make inference tractable. When a distinction required by a later query is not preserved by the current representation, the result is representational loss.
 
-This paper presents a structural view of reasoning under projection. It introduces a key distinction:
+The paper formalizes this problem using identifiability under projection. Given a projection from an underlying state space into a representation, a query is identifiable when it is constant over the equivalence classes induced by that projection. If the query is identifiable and the system answers incorrectly, the failure is error. If the query is not identifiable under the current representation, the failure is representational loss.
 
-- **Error** — incorrect reasoning within a representation (recoverable)  
-- **Loss** — missing distinctions due to projection (irrecoverable)
+This distinction gives the paper its central claim:
 
-Systems that do not maintain this distinction can produce outputs that are indistinguishable from correct reasoning while being structurally invalid.
+> A recurring structural failure occurs when systems treat non-identifiability under projection as though it were recoverable inference error.
 
-Many common reasoning failures arise from treating loss as recoverable error.
+The paper then identifies three structural requirements for reasoning under projection:
 
-The paper then outlines minimal structural requirements for stable reasoning:
+- **Partial observability of loss-relevant state**
+- **Bounded correction**
+- **Non-collapse of distinct representational roles**
 
-- **Observability of loss-relevant state**  
-- **Bounded correction**  
-- **Non-collapse of distinct levels**
-
-When these constraints are respected, reasoning behavior is expected to change in consistent ways:
-- invalid projections may be rejected  
-- collapsed structure may be expanded into admissible form  
-- missing structure may be introduced to restore stability  
-
-The result is not perfect reasoning, but reasoning that remains aligned with the information it actually contains.
+These requirements do not guarantee correctness. They constrain how reasoning behaves when the current representation does not support a requested conclusion.
 
 ---
 
-## Expected Behavioral Changes
+## Expected Behavioral Consequences
 
-If these constraints are enforced, reasoning systems are expected to:
+When these constraints are respected, reasoning systems are expected to:
 
-- reject invalid projections rather than produce unjustified conclusions  
-- preserve distinctions that would otherwise be collapsed  
-- represent uncertainty explicitly when distinctions cannot be recovered  
+- avoid presenting unsupported determinate answers as justified by the projection alone
+- preserve distinctions that would otherwise be collapsed
+- represent uncertainty explicitly when distinctions cannot be recovered
+- distinguish correction within a representation from representation expansion
+- separate inference from decision when action is required under non-identifiability
+
+The result is not perfect reasoning, but reasoning that remains aligned with the information actually available in the representation.
 
 ---
 
 ## Who This Is For
 
-This paper is intended for engineers, researchers, and practitioners working on reasoning systems, AI, or evaluation who want a structural understanding of why reasoning failures occur.
+This paper is intended for engineers, researchers, and practitioners working on reasoning systems, AI evaluation, alignment, or reliability who want a structural account of why some reasoning failures persist even when outputs appear coherent.
 
 ---
 
@@ -65,19 +61,21 @@ This paper is intended for engineers, researchers, and practitioners working on 
 This work focuses on **structural properties of reasoning**, not specific implementations or evaluated systems.
 
 It is intended as a conceptual framework for understanding:
-- why reasoning systems fail in systematic ways  
-- how those failures relate to information loss  
-- what constraints are required to make failure visible  
+
+- why some reasoning failures are representational rather than merely inferential
+- how those failures relate to projection and non-identifiability
+- what constraints help make representational loss visible
+- why output-level correctness alone may miss structural failure
 
 ---
 
 ## Notes on Implementation
 
-Operational details (such as prompt configurations, enforcement mechanisms, or evaluation results) are **not included** in this repository. This separation allows the framework to be evaluated independently of any specific technique or architecture.
+Operational details such as prompt configurations, enforcement mechanisms, runtime architectures, or evaluation results are **not included** in this repository.
 
-This is intentional. The paper is designed to stand independently of any particular implementation, and to describe constraints that apply across systems.
+This separation is intentional. The paper is designed to stand independently of any particular implementation and to describe constraints that apply across reasoning systems.
 
-Empirical evaluation of these ideas and their operationalization are described in separate work. Additional artifacts may be released at a later time.
+Empirical evaluation and operationalization of related ideas are described in separate work.
 
 ---
 
@@ -85,15 +83,15 @@ Empirical evaluation of these ideas and their operationalization are described i
 
 Modern reasoning systems can produce outputs that are:
 
-- coherent  
-- confident  
-- internally consistent  
+- coherent
+- confident
+- internally consistent
 
-Yet these outputs can be structurally invalid.
+Yet these outputs can still be structurally invalid.
 
-This occurs when systems treat irrecoverable loss as if it were recoverable error. The result is reasoning that appears correct but is not grounded in the information available to the system.
+This occurs when systems answer as though the current representation preserves distinctions that it has actually collapsed. In such cases, the problem is not merely that the system made a bad inference. The requested query may not be identifiable from the representation being used.
 
-This framework makes those failures visible, and defines the conditions required for reasoning to remain structurally aligned with its representation.
+This framework makes that failure mode explicit and defines structural conditions for reasoning to remain aligned with the information it actually contains.
 
 ---
 
@@ -118,9 +116,11 @@ Reasoning Under Projection: Error, Loss, and Structural Reliability in Compresse
 ## Status
 
 This paper is part of an ongoing line of work exploring:
-- reasoning under projection  
-- invariant-based reasoning constraints  
-- structural evaluation of reasoning systems  
+
+- reasoning under projection
+- identifiability and representational loss
+- invariant-based reasoning constraints
+- structural evaluation of reasoning systems
 
 Additional artifacts and implementations may be released as this work develops.
 
