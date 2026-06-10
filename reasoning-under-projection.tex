@@ -793,9 +793,11 @@ When these constraints are respected, the nature of reasoning is expected to cha
 
 This shift does not make reasoning systems infallible. It aligns them with the structure of the representations they operate on. Within this alignment, reasoning remains limited, but it becomes more reliable.
 
-The broader implication is that improvements in scale, optimization, or model complexity are not sufficient to produce stable reasoning on their own. Without structural constraints that account for projection and loss, increased capability may produce systems that are more persuasive without becoming proportionally more trustworthy.
+Reasoning under projection is therefore not a rare edge case. It is the typical condition in complex reasoning systems, especially when decisions depend on compressed, partial, or task-shaped representations. Even when a representation preserves all distinctions required for one query, it may fail to preserve those required for another. For this reason, reliability depends not only on how effectively a system reasons within a representation, but also on whether the projection that produced that representation preserves the distinctions required by the query being asked.
 
-Reasoning under projection is therefore not a rare edge case. It is the typical condition in complex reasoning systems, especially when decisions depend on compressed, partial, or task-shaped representations. Even when a representation is lossless for one query, it may be lossy for another. Recognizing these constraints is a necessary step for systems that aim not merely to produce answers, but to maintain a consistent relationship to the information they actually contain. How those constraints should be implemented or evaluated is a separate question beyond the scope of this paper.
+This observation has a broader implication. Improvements in scale, optimization, model complexity, or inference quality can increase performance over a representation without restoring distinctions collapsed by the projection that produced it. A system may therefore become more capable, more coherent, and more persuasive while remaining unable to justify certain conclusions from the information available to it. The challenge is not merely to improve reasoning within a representation, but to recognize when the representation itself no longer supports the requested inference.
+
+Reasoning under projection is unavoidable. The question is not whether systems will operate on compressed representations, but whether they can reliably distinguish between what those representations support, what they determine, and what they do not. How such distinctions should be implemented, detected, or evaluated remains a question for future work.
 
 \begin{thebibliography}{99}
 
