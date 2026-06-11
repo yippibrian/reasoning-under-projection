@@ -16,11 +16,13 @@ Error, Loss, and Structural Reliability in Compressed Representations}
 \maketitle
 
 \begin{abstract}
-Reasoning systems do not operate on full system state. They operate on compressed representations, where projection may collapse distinctions required for later inference, decision, or evaluation. When such distinctions remain operationally relevant and are not preserved or boundedly recoverable, the result is representational loss rather than merely uncertainty or correctable error.
+Reasoning systems do not operate on full system state. They operate on compressed representations, where projection may collapse distinctions required for later inference, decision, or evaluation. When such distinctions remain operationally relevant to the query, decision, or downstream use, and are not preserved or boundedly recoverable, the result is representational loss rather than merely uncertainty or correctable error.
 
 A recurring class of reasoning failures is therefore representational rather than merely inferential: when a query is not identifiable under the current representation, no improvement in inference over that representation can recover the missing distinction. When systems treat non-identifiability as correctable error, they produce overconfident conclusions, unstable decisions, and explanations that appear coherent but are not grounded in recoverable state.
 
-This paper identifies a structural failure mode across compressed reasoning systems: non-identifiability under projection is misclassified as recoverable inference error. We distinguish between error, which is correctable within the current representation, and loss, which cannot be resolved within the current representation without representation expansion, external information, or additional assumptions. When such loss cannot be resolved, it must be explicitly marked or traced so that claims depending on the missing distinction are not presented as admissible. We then outline structural conditions for reasoning that aims to remain reliable under projection: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels.
+This paper identifies a structural failure mode across compressed reasoning systems: non-identifiability under projection is misclassified as recoverable inference error. We distinguish between error, which is correctable within the current representation, and loss, which cannot be resolved within the current representation without representation expansion, external information, or additional assumptions. 
+
+When such loss cannot be resolved, claims depending on the missing distinction must be weakened, blocked, or explicitly marked and traced so that they are not presented as admissible inferences from the current representation. We then outline structural conditions for reasoning that aims to remain reliable under projection: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels.
 
 The goal is not to eliminate uncertainty, but to ensure that reasoning systems remain reliable in the presence of unavoidable projection. This work is conceptual and does not include empirical evaluation; it focuses on structural conditions rather than implementation-specific behavior.
 \end{abstract}
@@ -32,11 +34,14 @@ Although the argument is conceptual, its target is system design and evaluation.
 
 The framework is therefore normative in a limited epistemic sense. It does not describe how reasoning systems always behave, nor does it prescribe substantive decisions or values. It proposes admissibility criteria for reasoning under compression: a reasoning process should not present a conclusion as determined by a representation when the relevant query is not identifiable under that representation. In this sense, the requirements are correctness criteria for structurally reliable reasoning, not claims about all possible reasoning behavior.
 
-This paper makes three conceptual contributions. First, it formalizes the distinction between recoverable error and representational loss using identifiability under projection. Second, it characterizes a recurring failure mode in which systems treat non-identifiable queries as though they were ordinary inference errors. Third, it identifies three structural requirements that preserve the distinction in reasoning over compressed representations: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels.
+Admissibility is query-relative. A projection is not defective merely because it compresses or collapses distinctions. It becomes inadmissible for a particular use when a downstream claim depends on a distinction that the available representation does not preserve, cannot boundedly reconstruct, and cannot justify without additional assumptions or information.
+
+This paper makes three conceptual contributions. First, it formalizes the distinction between recoverable error and representational loss using identifiability under projection. Second, it characterizes a recurring failure mode in which systems treat non-identifiable queries as though they were ordinary inference errors. Third, it identifies three structural requirements that preserve the distinction in reasoning over compressed representations: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels. The claim is not that representational loss is the dominant source of reasoning failure, but that it is a recurring and structurally important failure mode that is often misclassified as ordinary error.
+
 
 \section{The Problem: Systems That Sound Right But Aren't}
 
-Consider a system asked to make a high-stakes classification based on a compressed summary of the available evidence. It produces a clear, well-justified answer, such as “approve” or “do not approve,” supported by that summary. The reasoning appears sound. However, the compressed representation may have collapsed distinctions between reversibility, uncertainty, causal structure, and decision criteria. The system has not made an error in reasoning; it has reasoned over a representation in which the information required to justify its conclusion is not preserved or boundedly recoverable.
+Consider a system asked to make a high-stakes classification based on a compressed summary of the available evidence. It produces a clear, well-justified answer, such as “approve” or “do not approve,” supported by that summary. The reasoning appears sound at the level of local coherence. However, the compressed representation may have collapsed distinctions between reversibility, uncertainty, causal structure, and decision criteria. The system has not made an error in reasoning; it has reasoned over a representation in which the information required to justify its conclusion is not preserved or boundedly recoverable. The failure is therefore not simply that the answer is wrong, but that local coherence has been mistaken for structural admissibility.
 
 This pattern recurs whenever representations compress distinctions required for valid inference.
 
@@ -68,7 +73,7 @@ This leads to conclusions that appear justified, but are not actually determined
 
 \subsection{A Shared Structure}
 
-These failure modes appear in different forms, but they share a common characteristic: the system produces outputs that appear well-formed, while the underlying reasoning process has lost critical distinctions.
+These failure modes appear in different forms, but they share a common characteristic: the system produces outputs that appear well-formed, while the available representation does not preserve, make reconstructable, or expose distinctions required by the query.
 
 This suggests that the problem is not isolated to specific techniques or implementations. Instead, it reflects a structural property of how reasoning is being performed.
 
@@ -98,7 +103,7 @@ Multiple distinct states in $S$ may map to the same representation in $R$.
 
 In this paper, projection refers specifically to transformations that induce non-trivial equivalence classes over the underlying state space: distinct states in $S$ are mapped to the same representation in $R$.
 
-The analysis is relative to a given projection $P$. A query may fail to be identifiable under one representation while becoming identifiable under a richer or differently structured representation. In practice, however, reasoning systems often operate under fixed or externally imposed projections: a prompt, summary, metric, dataset schema, interface boundary, token budget, or institutional decision format may determine what information is available at inference time. The question addressed here is therefore not whether some better representation could exist, but what follows when reasoning must proceed under the representation actually available.
+The analysis is relative to a given projection $P$. A query may fail to be identifiable under one representation while becoming identifiable under a richer or differently structured representation. In practice, however, reasoning systems often operate under fixed or externally imposed projections: a prompt, summary, metric, ranking, category, analogy, translation, dataset schema, interface boundary, token budget, or institutional decision format may determine what information is available at inference time. The question addressed here is therefore not whether some better representation could exist, but what follows when reasoning must proceed under the representation actually available.
 
 \subsection{Equivalence Classes and Collapse of Distinction}
 
@@ -151,7 +156,7 @@ A system may still act when $q$ is non-identifiable, but the action must be mark
 
 \subsection{When Projection Produces Representational Loss}
 
-When projection collapses a distinction that is not otherwise encoded in the representation, and that distinction is required for the query at hand, the distinction cannot be reconstructed without additional information, an expanded representation, or an explicitly valid reconstruction rule.
+Projection produces representational loss for a query when it collapses a distinction that is required for that query and the distinction is not otherwise encoded, boundedly reconstructable, or explicitly supplied by a valid assumption. The same projection may remain admissible for other queries whose answers are constant across the collapsed states.
 
 This is not a limitation of inference algorithms, but a structural property of the representation itself. No reasoning process operating solely on $R$ can reliably recover distinctions that are not encoded in $R$ or derivable from structure preserved in $R$.
 
@@ -161,7 +166,7 @@ Systems that do not distinguish between error and loss can produce outputs that 
 
 Reasoning under projection is therefore constrained by the information preserved in the representation. Any attempt to infer distinctions that are not preserved or boundedly recoverable must either introduce additional assumptions, expand the representation, or obtain information outside the current representation.
 
-The failure modes described in Section 1 arise when systems behave as though these lost distinctions can be recovered through additional reasoning.
+The failure modes described in Section 1 arise when systems behave as though distinctions not preserved or boundedly recoverable in the current representation can nevertheless be recovered through additional reasoning over that representation.
 
 \section{The Critical Distinction: Error vs Loss}
 
@@ -216,7 +221,9 @@ In each case, the system produces an output that appears well-formed, but the re
 
 \subsection{Detection and Representation of Loss}
 
-Unlike error, loss cannot be corrected through additional reasoning over the same representation alone. Instead, it must be explicitly marked, bounded, or traced. Such marking preserves accountability for the missing distinction, but does not make claims depending on that distinction admissible.
+Unlike error, loss cannot be corrected through additional reasoning over the same representation alone. The system must instead change the epistemic status of the claim or change the representation on which the claim depends. It may request additional information, expand or refine the representation, reconstruct the distinction through an explicit bounded path, weaken the claim into a conditional, or mark and trace the loss. Marking and tracing preserve accountability for the missing distinction, but they do not make claims depending on that distinction admissible.
+
+Tracing does not recover the missing distinction. It records the dependency, assumption, or point of loss so that downstream claims are not treated as if the distinction were preserved. This distinction matters because not all forms of dependency status support the same kind of reasoning.
 
 This can take several forms:
 \begin{itemize}[leftmargin=1.5em]
@@ -226,6 +233,8 @@ This can take several forms:
 \end{itemize}
 
 The key requirement is that the system does not collapse indistinguishable states into a single unjustified conclusion.
+
+Dependency status after projection can be ordered as a degradation ladder: a distinction may be preserved, boundedly reconstructable, merely traceable, or opaque. Preserved and reconstructable distinctions can support inference, though reconstructable distinctions require an explicit recovery path. Traceable distinctions support accountability for transformation or loss, but not recovery of the original relation. Opaque loss supports neither recovery nor audit. This paper uses the ladder only to distinguish forms of support for inference; a fuller account of how dependency status should be represented, audited, or updated is left to downstream work.
 
 \subsection{Structural Consequence}
 
@@ -246,9 +255,9 @@ This yields a simple structural test: if a query is not identifiable under the c
 
 The formal result above does not by itself specify a reasoning policy. It constrains what any such policy must respect if it is to avoid treating non-identifiability as ordinary error.
 
-The immediate consequences motivate three structural requirements that later work treats as necessary consequences of reconstructibility under projection: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels. Unsupported determinacy motivates observability of loss-relevant state: the system must preserve detectable signals that a query is unsupported. The correction boundary motivates bounded correction: the system must not treat hidden reconstruction as ordinary repair. Decision/inference separation motivates non-collapse of distinct representational roles: the system must not treat a projected object as if it had the authority of the richer object from which it was projected.
+The immediate consequences motivate three structural requirements. First, unsupported determinacy motivates observability of loss-relevant state: the system must preserve detectable signals that a query is unsupported by the available representation. Second, the correction boundary motivates bounded correction: the system must not treat hidden reconstruction or silently imported assumptions as ordinary repair. Third, decision/inference separation motivates non-collapse of distinct representational roles: the system must not treat a projected object as if it had the authority of the richer object from which it was projected.
 
-These requirements are not additional impossibility results. They are structural constraints on reasoning systems that operate under projection.
+These requirements are not independent axioms or additional impossibility results. They are structural constraints on reasoning systems that operate under projection: if a query is not determined by the current representation, reliable reasoning must preserve that fact, avoid pretending it can be repaired within the same representation, and distinguish inference from decisions made under non-identifiability.
 
 We describe the three requirements in turn.
 
@@ -325,9 +334,9 @@ If a reasoning process respects the structural conditions described in Section 4
 
 \begin{itemize}[leftmargin=1.5em]
     \item \textbf{Unsupported determinacy:} when required distinctions are unavailable under the current representation, the system does not present a determinate answer as justified by the projection alone (Case 1).
-    \item \textbf{Expansion of collapsed structure:} when distinctions have been compressed, the system reconstructs a representation that preserves them (Case 2).
+    \item \textbf{Expansion of collapsed structure:} when distinctions have been compressed but can be restored by reformulating the task or enriching the representation, the system makes that representation change explicit (Case 2).
     \item \textbf{Explicit representation of uncertainty:} when distinctions cannot be recovered, the system preserves multiple consistent possibilities rather than forcing resolution (Cases 2, 5, and 6).
-    \item \textbf{Augmentation of missing structure:} when necessary structure is absent, the system introduces monitoring, ownership, or other admissibility-preserving structure (Cases 3 and 4).
+    \item \textbf{Identification of missing structure:} when necessary structure is absent, the system identifies what monitoring, ownership, reassessment, or representation expansion would be required for an admissible decision (Cases 3 and 4).
     \item \textbf{Decision separation:} policy choices under non-identifiability are marked as decisions rather than inferred conclusions (Case 6).
     \item \textbf{Error classification:} identifiable queries answered incorrectly remain ordinary errors rather than representational loss (Case 7).
     \item \textbf{Diagnostic limitation:} cases that cannot be classified from the current representation identify what additional structure must be made observable (Case 8).
@@ -369,7 +378,7 @@ One possible policy response is refusal to answer in the requested form. Other a
 
 This demonstrates the first mode of behavior:
 \begin{itemize}[leftmargin=1.5em]
-    \item when the representation fails to preserve or boundedly recover essential distinctions, the system rejects the projection rather than producing an unjustified conclusion.
+    \item when the representation fails to preserve or boundedly recover essential distinctions, the system does not treat the projected answer as justified by the representation alone.
 \end{itemize}
 
 \subsection{Case 2: Causal Attribution Under Collapse}
@@ -386,7 +395,7 @@ Here the relevant query is not simply ``who can be named as responsible?'' but `
 
 The result is a cautious answer that avoids obvious error but does not fully preserve the underlying causal distinctions.
 
-A structurally constrained response would handle the task differently. It explicitly identifies the collapse of multiple causal factors into a single attribution as a loss of structure. It then reconstructs a valid representation by separating:
+A structurally constrained response would handle the task differently. It explicitly identifies the collapse of multiple causal factors into a single attribution as a loss of structure. It then reformulates the representation into a more admissible structure by separating:
 \begin{itemize}[leftmargin=1.5em]
     \item individual actions,
     \item process failures,
@@ -413,7 +422,8 @@ While reasonable, this response does not identify the structural issue introduce
 
 A structurally constrained response would identify the absence of revalidation as a failure of bounded correction. It notes that without mechanisms for monitoring and revision, the system cannot maintain a stable relationship between decisions and underlying state.
 
-The response then introduces additional structure not present in the prompt:
+The response then identifies the additional structure that would be required for an admissible decision:
+
 \begin{itemize}[leftmargin=1.5em]
     \item conditional approval criteria,
     \item monitoring requirements,
@@ -423,7 +433,7 @@ The response then introduces additional structure not present in the prompt:
 
 This demonstrates a third mode of behavior:
 \begin{itemize}[leftmargin=1.5em]
-    \item when necessary structure is missing, the system augments the representation to restore admissibility.
+    \item when necessary structure is missing, the system marks the decision as unsupported unless the representation is expanded, monitored, or governed by an explicit decision rule.
 \end{itemize}
 
 \subsection{Case 4: Policy Interaction and Emergent Failure}
@@ -445,7 +455,7 @@ A structurally constrained response would reframe the problem. It identifies the
     \item privacy policies remove the observability required to distinguish these states.
 \end{itemize}
 
-The response then introduces explicit constraints required for stability:
+The response then identifies explicit constraints that would be required for stability:
 \begin{itemize}[leftmargin=1.5em]
     \item alignment between cache lifetime and authentication validity,
     \item explicit invalidation tied to state changes,
@@ -453,7 +463,7 @@ The response then introduces explicit constraints required for stability:
     \item assignment of responsibility for cross-policy interaction.
 \end{itemize}
 
-This is not simply a more detailed answer. It is a different form of reasoning, in which the system identifies and enforces the structural conditions required for the system to remain diagnosable and correct under composition.
+This is not simply a more detailed answer. It is a different form of reasoning, in which the system identifies the structural conditions required for the system to remain diagnosable and correct under composition, rather than treating isolated policy compliance as sufficient.
 
 \subsection{Case 5: Unsupported Source Reconstruction}
 
@@ -477,7 +487,8 @@ Not every ambiguity indicates representational loss. Suppose a system is asked t
 
 In this case, the relevant query is identifiable under the projection: any two underlying states with the same represented table values require the same computed answer. The failure is therefore not loss, but error. A corrected reasoning procedure can recover the right answer from the same representation without adding new information.
 
-This borderline case matters because it prevents the framework from treating every failure as projection loss. The error--loss distinction is useful only if it separates cases where correction within the representation is possible from cases where the representation itself no longer supports the requested distinction.
+This borderline case matters because it prevents the framework from treating every failure as representational loss. The error--loss distinction is useful only if it separates cases where correction within the representation is possible from cases where the representation itself no longer supports the requested distinction.
+
 
 \subsection{Case 8: Ambiguous Boundary Under Limited Observability}
 
@@ -487,29 +498,27 @@ In this case, the framework does not by itself determine the correct classificat
 
 \subsection{Summary of Behavioral Modes}
 
-The examples distinguish refusal, restructuring, and augmentation as possible responses to non-identifiability, but this paper does not provide a complete policy for selecting among them. That choice depends on whether representation expansion is available, whether additional observations can be obtained, whether the task permits abstention, and whether a decision rule under non-identifiability has been specified.
+The examples distinguish refusal, restructuring, conditional decision, representation expansion, and diagnostic marking as possible responses to non-identifiability, but this paper does not provide a complete policy for selecting among them. That choice depends on whether representation expansion is available, whether additional observations can be obtained, whether the task permits abstention, and whether a decision rule under non-identifiability has been specified.
 
-Across these examples, respecting the constraints changes whether the system answers, refuses, restructures, augments, or classifies the failure. These behaviors are testable expectations for future work and illustrate how maintaining the error--loss distinction changes the type of reasoning performed under projection.
+Across these examples, respecting the constraints changes whether the system answers, refuses, restructures, conditionalizes, expands the representation, or classifies the failure. These behaviors are testable expectations for future work and illustrate how maintaining the error--loss distinction changes the type of reasoning performed under projection.
 
 \section{Relation to Existing Frameworks}
 
-The argument in this paper overlaps with several established lines of work. In statistics and causal inference, identifiability asks whether a target quantity can be determined from the available observational structure \cite{Pearl2009}. In partially observable decision processes, agents must act over compressed or incomplete state representations \cite{Kaelbling1998}. In formal methods and abstract interpretation, abstraction maps concrete states into reduced domains while preserving selected properties \cite{Cousot1977}. In information-theoretic approaches such as the information bottleneck, compressed representations are evaluated by what task-relevant information they retain \cite{Tishby1999}.
+The argument in this paper overlaps with several established lines of work. In statistics and causal inference, identifiability asks whether a target quantity can be determined from the available observational structure \cite{Pearl2009}. In statistical decision theory, comparison of experiments and sufficiency ask when one signal or observation preserves enough information for a class of decisions \cite{Blackwell1953}. In partially observable decision processes, agents must act over incomplete state representations \cite{Kaelbling1998}. In work on state abstraction, compressed states are evaluated by whether they preserve value, policy, reward, transition, or model-relevant properties \cite{Li2006}. In formal methods and abstract interpretation, abstraction maps concrete states into reduced domains while preserving selected properties \cite{Cousot1977}; counterexample-guided abstraction refinement studies how an abstraction may be refined when it is too coarse for the property being checked \cite{Clarke2000}. In information-theoretic approaches such as the information bottleneck, compressed representations are evaluated by what task-relevant information they retain \cite{Tishby1999}.
 
-The present paper does not claim to replace these frameworks. Its contribution is to identify a behavioral failure mode that cuts across them. Prior work defines when a query is identifiable, when an abstraction preserves a property, or when an agent acts under partial observability. The failure analyzed here occurs when a reasoning system behaves as though the relevant identifiability or preservation condition holds when it does not. In that case, non-identifiability under projection is misclassified as ordinary inference error, and the system produces determinate outputs from a representation that does not support them.
+The present paper does not claim that these frameworks are equivalent, nor does it replace their domain-specific accounts of identifiability, abstraction, observability, or belief-state update. Instead, it identifies a shared reasoning-system failure pattern: a downstream reasoner is asked to draw a determinate conclusion from a representation that may not preserve the distinctions required by the query. Prior work often specifies when a property is identifiable, when an abstraction is sound, when a statistic is sufficient, or when a belief state supports action. The failure analyzed here occurs when a reasoning system behaves as though the relevant identifiability, sufficiency, or preservation condition holds when it does not.
 
-The formal ingredients used here are not new in isolation. Identifiability, partial observability, abstraction, and underdetermination all describe cases in which a representation fails to preserve distinctions relevant to a query or decision. The contribution of this paper is not to replace those accounts, but to identify a recurring reasoning-system failure that cuts across them: systems often behave as though the relevant identifiability, sufficiency, or preservation condition holds when it does not. This misclassification turns representational insufficiency into apparent inference error, leading systems to repair, explain, or decide beyond what the current representation supports.
+The error--loss distinction is therefore a diagnostic constraint on reasoning behavior. If the query is identifiable under the current representation and the system answers incorrectly, the failure is ordinary error. If the query is not identifiable, then additional optimization, prompting, explanation, or evaluation within the same representation cannot by itself recover the missing distinction. The system must instead expand the representation, obtain new information, introduce an explicit assumption or decision rule, weaken the claim, or mark the dependency as traceable or opaque.
 
-In a POMDP, partial observability is typically handled by maintaining or updating a belief state. In abstract interpretation, loss is managed through sound abstraction and possible refinement. In causal inference, non-identifiability blocks recovery of a target from the available observational structure. The present paper abstracts over these settings and focuses on a different question: how should a reasoning system behave when its current representation does not support the query being asked? The error--loss distinction is therefore a diagnostic constraint on reasoning behavior, not a replacement for domain-specific theories of identifiability, abstraction, or belief-state update.
+\section{Why Existing Approaches May Miss Representational Loss}
 
-The contribution is not a new theory of identifiability, abstraction, or partial observability. It is a unifying account of a reasoning failure mode: systems produce determinate outputs as though the relevant identifiability or preservation condition holds when the current representation does not support it.
-
-\section{Why Existing Approaches May Miss Projection Loss}
-
-The failure modes described in earlier sections do not arise from a lack of sophistication in current reasoning systems. Many existing approaches incorporate advanced optimization, large-scale training, and increasingly complex evaluation strategies. Despite this, the same structural failures are widely observed.
+The failure modes described in earlier sections do not arise from a lack of sophistication in current reasoning systems. Many existing approaches incorporate advanced optimization, large-scale training, and increasingly complex evaluation strategies. Despite this, structurally similar failures remain common: systems may improve performance within a representation while still failing to detect when the representation does not support the requested inference.
 
 This section outlines why these failures occur, even in well-designed systems.
 
 The common mismatch is that existing approaches often optimize or evaluate behavior within $R$, while the failure arises from the projection $P$ that determines which distinctions $R$ preserves. They can therefore improve performance inside a representation without enforcing correctness relative to the projection that produced it.
+
+Here $R$ should not be understood narrowly as the prompt alone. It includes whatever representational state is available to the reasoning process, including represented priors, retrieved evidence, metadata, provenance, uncertainty markers, task constraints, and explicit assumptions. The relevant question is not whether a distinction was absent from the prompt, but whether it was available, boundedly reconstructable, or explicitly assumed in the representation actually used.
 
 \subsection{Optimization Without Structural Constraints}
 
@@ -525,7 +534,7 @@ As a result, optimization can produce outputs that score highly according to the
 
 These effects are not anomalies. They are a consequence of optimizing over representations that do not preserve loss-relevant structure, consistent with known failures of metric-based optimization \cite{Goodhart1975}. Without explicit constraints, optimization favors outputs that appear correct within the metric, even when the reasoning process is unstable.
 
-\subsection{Prompting Without Invariant Enforcement}
+\subsection{Prompting Without Dependency-Status Enforcement}
 
 In interactive systems, prompting strategies are often used to guide reasoning behavior. These strategies can improve performance in specific cases by encouraging step-by-step reasoning, reflection, or self-correction.
 
@@ -555,7 +564,8 @@ In particular, evaluation often does not detect:
 
 A system may produce a correct answer for the wrong reasons, or an incorrect answer that appears well-justified. In both cases, evaluation based solely on outcomes fails to capture the underlying structural failure.
 
-Without explicit representation of projection loss, evaluation over outputs in $R$ cannot reliably distinguish between:
+Without explicit representation of dependency status or representational loss, evaluation over outputs in $R$ cannot reliably distinguish between:
+
 \begin{itemize}[leftmargin=1.5em]
     \item correct reasoning,
     \item incorrect reasoning that happens to produce the correct result,
@@ -659,21 +669,6 @@ The system distinguishes between:
 
 This separation allows decisions to be evaluated independently of the reasoning process that produced the set of possibilities. It also makes clear where assumptions or preferences enter the system.
 
-\subsection{Compatibility with Existing Methods}
-
-These constraints do not replace existing techniques for reasoning, optimization, or evaluation. They operate at a different level. A system may continue to use:
-
-\begin{itemize}[leftmargin=1.5em]
-    \item learned models,
-    \item heuristic search,
-    \item prompt-based guidance,
-    \item metric-based evaluation,
-\end{itemize}
-
-provided that the resulting reasoning process satisfies the structural conditions required under projection.
-
-In this sense, the constraints act as a boundary on acceptable behavior rather than a prescription for a specific implementation.
-
 \subsection{Summary}
 
 Respecting the structural constraints imposed by projection does not make reasoning systems infallible. It changes the nature of their failures.
@@ -686,6 +681,22 @@ Failures become:
 \end{itemize}
 
 This shift is sufficient to transform reasoning from a process that produces plausible outputs into one that maintains a reliable relationship to the information it actually contains.
+
+\section{Operational Hooks}
+
+Although this paper does not propose a specific implementation, the structural requirements suggest several limited operational hooks. These are not mechanisms or evaluation procedures, but examples of the kinds of representational features a downstream implementation might need.
+
+First, systems can represent uncertainty sets or hypothesis sets rather than forcing a single state estimate when multiple states remain consistent with the representation.
+
+Second, systems can track the dependency status of a requested query under the current representation, distinguishing preserved, reconstructable, traceable, and opaque dependencies.
+
+Third, systems can use abstention, refusal, branching, or conditionalization when a determinate answer would require resolving distinctions not present in the representation.
+
+Fourth, systems can separate inference from decision, making explicit when a choice is being made under non-identifiability rather than derived from the available representation.
+
+Fifth, systems can maintain typed distinctions between observations, inferred models, decisions, and explanations, reducing the risk that conclusions are treated as properties of the underlying state.
+
+These hooks do not constitute a complete architecture. They indicate where the structural account may place requirements on downstream scaffolds, runtime systems, or evaluation methods.
 
 \section{Scope and Limits}
 
@@ -733,7 +744,7 @@ This paper does not prescribe specific representations. It provides constraints 
 
 \subsection{Separation from Implementation}
 
-This paper focuses on structural behavior rather than specific implementations. Operational instantiations, scaffold designs, evaluation harnesses, and empirical results are therefore outside its scope.
+This paper focuses on structural behavior rather than specific implementations. Operational instantiations, scaffold designs, evaluation harnesses, and empirical results are therefore treated as downstream work rather than as claims established here.
 
 The constraints described here are structural rather than algorithmic. They do not specify how a system should be implemented, trained, or evaluated in detail.
 
@@ -741,13 +752,36 @@ As a result, multiple systems with different architectures and methodologies may
 
 This separation allows the framework to apply across domains without requiring a specific technical approach.
 
+\subsection{Compatibility with Existing Methods}
+
+These constraints do not replace existing techniques for reasoning, optimization, or evaluation. They operate at a different level. A system may continue to use:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item learned models,
+    \item heuristic search,
+    \item prompt-based guidance,
+    \item metric-based evaluation,
+\end{itemize}
+
+provided that the resulting reasoning process satisfies the structural conditions required under projection.
+
+In this sense, the constraints act as a boundary on acceptable behavior rather than a prescription for a specific implementation.
+
+\subsection{Mechanism and Evaluation as Downstream Work}
+
+This paper deliberately stops at the level of structural criteria. It does not propose a complete detector for non-identifiability, a dependency-status implementation, or an empirical benchmark suite. That boundary is intentional: before such mechanisms can be evaluated, the target failure mode must be specified. The present account defines that target as the misclassification of non-identifiability under projection as recoverable inference error.
+
+This does not mean that mechanism and evaluation are optional. It means that they are downstream tasks constrained by the structural account. A detector for representational loss would need to identify when a query depends on distinctions that are neither preserved, nor boundedly reconstructable, nor explicitly assumed in the current representation. A dependency-status implementation would need to represent whether a claim is preserved, reconstructable, traceable, or opaque. A benchmark would need to test whether a system distinguishes unsupported determinacy from ordinary error, changes behavior when the representation is enriched, and avoids presenting proxy success as target support. One natural benchmark pattern is to compare behavior under paired compressed and enriched representations, testing whether the system distinguishes unsupported determinacy from ordinary error when the compressed representation does not preserve the distinctions required by the query.
+
+The contribution here is therefore not a complete operational solution, but a constraint that any such solution must satisfy. Mechanisms for detecting, representing, and benchmarking representational loss depend on the architecture, representation, and evaluation setting. The present paper defines the structural failure those mechanisms would need to address.
+
 \subsection{Limits of Observability}
 
 While the framework requires observability of loss-relevant state, this observability is itself subject to projection. A system may be unable to represent certain forms of loss because the representation does not include the necessary structure.
 
 This creates an important limitation: loss can only be detected relative to distinctions that the representation is capable of expressing. A system cannot observe every loss introduced by its own projection; it can only mark the boundaries where the current representation no longer supports a requested query.
 
-In such cases, the system cannot indicate the presence of loss, even if it exists. This places a practical limit on how completely loss can be made visible within any given representation.
+In such cases, the system may be unable to indicate the specific lost distinction, even if loss exists. It may still be able to mark a weaker diagnostic condition, such as missing variables, unsupported assumptions, or insufficient provenance. This places a practical limit on how completely loss can be made visible within any given representation.
 
 As a result, the framework supports improvement of observability, but does not guarantee its completeness.
 
@@ -765,22 +799,6 @@ Instead, they ensure that these limitations are:
 
 Within these limits, reasoning systems can remain reliable even when they cannot be fully accurate.
 
-\section{Operational Hooks}
-
-Although this paper does not propose a specific implementation, the structural requirements suggest several implementation hooks.
-
-First, systems can represent uncertainty sets or hypothesis sets rather than forcing a single state estimate when multiple states remain consistent with the representation.
-
-Second, systems can track whether a requested query is supported by the current representation, distinguishing identifiable questions from questions that require additional information.
-
-Third, systems can use abstention or refusal criteria when a determinate answer would require resolving distinctions not present in the representation.
-
-Fourth, systems can separate inference from decision, making explicit when a choice is being made under non-identifiability rather than derived from the available representation.
-
-Fifth, systems can maintain typed distinctions between observations, inferred models, decisions, and explanations, reducing the risk that conclusions are treated as properties of the underlying state.
-
-These hooks do not constitute a complete architecture. They indicate how the structural account could be made operational without committing this paper to a particular scaffold, runtime system, or evaluation method.
-
 \section{Conclusion}
 
 Reasoning systems operate over representations that compress the underlying structure of the problems they address. This compression is not optional. It is required for tractability. However, it can collapse distinctions that later reasoning may require.
@@ -795,26 +813,46 @@ This shift does not make reasoning systems infallible. It aligns them with the s
 
 Reasoning under projection is therefore not a rare edge case. It is the typical condition in complex reasoning systems, especially when decisions depend on compressed, partial, or task-shaped representations. Even when a representation preserves all distinctions required for one query, it may fail to preserve those required for another. For this reason, reliability depends not only on how effectively a system reasons within a representation, but also on whether the projection that produced that representation preserves the distinctions required by the query being asked.
 
-This observation has a broader implication. Improvements in scale, optimization, model complexity, or inference quality can increase performance over a representation without restoring distinctions collapsed by the projection that produced it. A system may therefore become more capable, more coherent, and more persuasive while remaining unable to justify certain conclusions from the information available to it. The challenge is not merely to improve reasoning within a representation, but to recognize when the representation itself no longer supports the requested inference.
+This observation has a broader implication. Improvements in scale, optimization, model complexity, or inference quality can increase performance over a representation without restoring distinctions that the projection failed to preserve for the query at hand. A system may therefore become more capable, more coherent, and more persuasive while remaining unable to justify certain conclusions from the information available to it. The challenge is not merely to improve reasoning within a representation, but to recognize when the representation itself no longer supports the requested inference.
 
 Reasoning under projection is unavoidable. The question is not whether systems will operate on compressed representations, but whether they can reliably distinguish between what those representations support, what they determine, and what they do not. How such distinctions should be implemented, detected, or evaluated remains a question for future work.
 
 \begin{thebibliography}{99}
-
-\bibitem{Goodhart1975}
-Charles Goodhart.
-\newblock Problems of Monetary Management: The U.K. Experience.
-\newblock 1975.
 
 \bibitem{Amodei2016}
 Dario Amodei et al.
 \newblock Concrete Problems in AI Safety.
 \newblock arXiv:1606.06565, 2016.
 
-\bibitem{Shannon1948}
-Claude Shannon.
-\newblock A Mathematical Theory of Communication.
-\newblock Bell System Technical Journal, 1948.
+\bibitem{Blackwell1953}
+David Blackwell.
+\newblock Equivalent comparisons of experiments.
+\newblock The Annals of Mathematical Statistics, 1953.
+
+\bibitem{Clarke2000}
+Edmund M. Clarke, Orna Grumberg, Somesh Jha, Yuan Lu, and Helmut Veith.
+\newblock Counterexample-guided abstraction refinement.
+\newblock CAV, 2000.
+
+\bibitem{Cousot1977}
+Patrick Cousot and Radhia Cousot.
+\newblock Abstract interpretation: A unified lattice model for static analysis of programs by construction or approximation of fixpoints.
+\newblock POPL, 1977.
+
+\bibitem{Goodhart1975}
+Charles Goodhart.
+\newblock Problems of Monetary Management: The U.K. Experience.
+\newblock 1975.
+
+\bibitem{Kaelbling1998}
+Leslie Pack Kaelbling, Michael L. Littman, and Anthony R. Cassandra.
+\newblock Planning and acting in partially observable stochastic domains.
+\newblock Artificial Intelligence, 1998.
+
+\bibitem{Li2006}
+Lihong Li, Thomas J. Walsh, and Michael L. Littman.
+\newblock Towards a unified theory of state abstraction for MDPs.
+\newblock ISAIM, 2006.
 
 \bibitem{Pearl2009}
 Judea Pearl.
@@ -826,15 +864,10 @@ Leonard J. Savage.
 \newblock The Foundations of Statistics.
 \newblock 1954.
 
-\bibitem{Kaelbling1998}
-Leslie Pack Kaelbling, Michael L. Littman, and Anthony R. Cassandra.
-\newblock Planning and acting in partially observable stochastic domains.
-\newblock Artificial Intelligence, 1998.
-
-\bibitem{Cousot1977}
-Patrick Cousot and Radhia Cousot.
-\newblock Abstract interpretation: A unified lattice model for static analysis of programs by construction or approximation of fixpoints.
-\newblock POPL, 1977.
+\bibitem{Shannon1948}
+Claude Shannon.
+\newblock A Mathematical Theory of Communication.
+\newblock Bell System Technical Journal, 1948.
 
 \bibitem{Tishby1999}
 Naftali Tishby, Fernando C. Pereira, and William Bialek.
