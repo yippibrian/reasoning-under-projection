@@ -22,24 +22,30 @@ This distinction gives the paper its central claim:
 
 The claim is not that representational loss is the dominant source of reasoning failure. Rather, the paper identifies a recurring and structurally important failure mode that is often misclassified as ordinary error.
 
-The paper then identifies three structural requirements for reasoning under projection:
+The paper also characterizes the **dependency status** of claims after projection: whether the distinctions required by a claim are preserved, reconstructable, traceable, or opaque.
+
+It also identifies three structural constraints that help preserve and act on dependency status during reasoning:
 
 * **Partial observability of loss-relevant state**
 * **Bounded correction**
 * **Non-collapse of distinct representational roles**
 
-These requirements do not guarantee correctness. They constrain how reasoning behaves when the current representation does not support a requested conclusion.
+These requirements are not claimed to be necessary and sufficient for all reliable reasoning under projection. They are failure-preserving constraints: observability addresses cases where unsupported dependencies become invisible; bounded correction addresses cases where a system silently changes the information basis of a claim; and non-collapse addresses cases where support at one representational level is treated as support at another.
 
 ---
 
 ## Dependency Status
 
+For a query and a representation, **dependency status** refers to the kind of support the representation provides for the distinctions on which an answer depends. It is not identical to provenance, confidence, observability, or identifiability, although it may involve each of them.
+
 The paper distinguishes several forms of support a representation may provide for a query:
 
-* **Preserved** — the relevant distinction survives projection.
-* **Reconstructable** — the distinction can be recovered through an explicit bounded path.
-* **Traceable** — the distinction cannot be recovered, but the dependency, assumption, or point of loss can be audited.
+* **Preserved** — the relevant distinction remains directly represented in a form sufficient for the query.
+* **Reconstructable** — the distinction is not directly represented, but can be recovered through an explicit bounded procedure using information available in the representation.
+* **Traceable** — the distinction cannot be recovered, but the dependency, assumption, source, transformation, or point of loss can be audited.
 * **Opaque** — the distinction is neither recoverable nor auditable from the current representation.
+
+The boundary between reconstructable and traceable depends on whether the representation contains enough information to recover the distinction needed by the query, not merely enough information to identify where that distinction once came from. For example, a source hash, citation identifier, or provenance pointer may make a dependency traceable by recording that a claim depends on an external source. It is reconstructable only if the representation available to the reasoner also includes, retrieves, or otherwise supplies enough source content and recovery rules to determine the query-relevant distinction.
 
 Preserved and reconstructable distinctions can support inference. Traceable distinctions support accountability for transformation or loss, but not recovery of the original relation. Opaque loss supports neither recovery nor audit.
 
@@ -72,7 +78,7 @@ When these constraints are respected, reasoning systems are expected to:
 * represent uncertainty explicitly when distinctions cannot be recovered
 * distinguish correction within a representation from representation expansion
 * separate inference from decision when action is required under non-identifiability
-* mark traceable or opaque dependencies rather than treating them as preserved
+* mark traceable or opaque dependencies rather than treating them as preserved or reconstructable
 
 The result is not perfect reasoning, but reasoning that remains aligned with the information actually available in the representation.
 
@@ -169,7 +175,7 @@ This paper is part of an ongoing line of work exploring:
 * reasoning under projection
 * identifiability and representational loss
 * dependency-status tracking
-* invariant-based reasoning constraints
+* structural constraints for reasoning under projection
 * structural evaluation of reasoning systems
 
 Additional artifacts and implementations may be released as this work develops.
