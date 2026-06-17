@@ -34,6 +34,8 @@ This paper is intended as a conceptual bridge. It does not present an empirical 
 
 Although the argument is conceptual, its target is system design and evaluation. The framework formalizes when a query is unsupported by a representation, identifies the failure that occurs when such non-identifiability is treated as correctable error, and motivates structural requirements that make this failure visible.
 
+A further operational consequence is that the framework constrains response form. When a query is unsupported by the current representation, the system need not simply abstain. Depending on dependency status, it may answer directly, answer conditionally, branch over assumptions, request representation expansion, retrieve or expose missing support, mark a dependency, route the query to an appropriate source or decision procedure, or refuse the requested form. The central question is therefore not only whether an answer is correct, but whether the form of the answer is admissible under the representation available to the system.
+
 The framework is therefore normative in a limited epistemic sense. It does not describe how reasoning systems always behave, nor does it prescribe substantive decisions or values. It proposes admissibility criteria for reasoning under compression: a reasoning process should not present a conclusion as determined by a representation when the relevant query is not identifiable under that representation. In this sense, the requirements are correctness criteria for structurally reliable reasoning, not claims about all possible reasoning behavior.
 
 Admissibility is query-relative. A projection is not defective merely because it compresses or collapses distinctions. It becomes inadmissible for a particular use when a downstream claim depends on a distinction that the available representation does not preserve, cannot boundedly reconstruct, and cannot justify without additional assumptions or information.
@@ -80,6 +82,8 @@ where $S$ is the full system state and $R$ is the representation used for reason
 
 Multiple distinct states in $S$ may map to the same representation in $R$.
 
+A simple example illustrates the query-relative nature of projection. A black-and-white image may preserve shape while losing color. It remains admissible for many shape queries, but not for a query that depends on whether an object was red or green. The projection is not defective in general; it is insufficient for queries whose answers depend on the collapsed distinction.
+
 In this paper, projection refers specifically to transformations that induce non-trivial equivalence classes over the underlying state space: distinct states in $S$ are mapped to the same representation in $R$.
 
 The analysis is relative to a given projection $P$. A query may fail to be identifiable under one representation while becoming identifiable under a richer or differently structured representation. In practice, however, reasoning systems often operate under fixed or externally imposed projections: a prompt, summary, metric, ranking, category, analogy, translation, dataset schema, interface boundary, token budget, or institutional decision format may determine what information is available at inference time. The question addressed here is therefore not whether some better representation could exist, but what follows when reasoning must proceed under the representation actually available.
@@ -123,7 +127,7 @@ If $q$ is not identifiable, then there exist $s_1,s_2\in S$ such that $P(s_1)=P(
 
 The formal claim is limited: non-identifiability means that no function over the current representation can recover the query for all underlying states. The design question is what a reasoning system should do when this condition holds. The remaining sections describe structural requirements and behavioral consequences, rather than additional formal impossibility results.
 
-This separates the descriptive and normative parts of the argument. The descriptive claim is that non-identifiability prevents recovery of $q$ from $R$ alone. The normative claim is an epistemic admissibility criterion: a reasoning system should not present a conclusion as determined by $R$ when the conclusion depends on distinctions that $R$ does not preserve or make reconstructable. This criterion does not require inaction. It requires that action under non-identifiability be marked as a decision rule, assumption, conditional response, request for representation expansion, or unresolved dependency rather than as an inference licensed by the current representation.
+This separates the descriptive and normative parts of the argument. The descriptive claim is that non-identifiability prevents recovery of $q$ from $R$ alone. The normative claim is an epistemic admissibility criterion: a reasoning system should not present a conclusion as determined by $R$ when the conclusion depends on distinctions that $R$ does not preserve or make reconstructable. This criterion does not require inaction. It requires that action under non-identifiability be marked as a decision rule, assumption, conditional response, request for representation expansion, or unresolved dependency rather than as an inference licensed by the current representation. Non-identifiability does not imply silence; it changes the epistemic status of speech.
 
 Admissibility is intentionally weaker than correctness. The framework does not determine which decision procedure a system must use when $R$ is insufficient, nor does it prohibit probabilities, confidence intervals, ranked hypotheses, priors, utility functions, or policy choices. It constrains the epistemic status of the output: a claim should not be presented as following from $R$ alone when it depends on distinctions that $R$ does not preserve or make reconstructable. A probabilistic or decision-theoretic response may be admissible if it marks the assumptions, priors, utilities, or decision rules on which it depends; it becomes inadmissible when those elements are presented as if they were determined by the representation itself.
 
@@ -214,6 +218,8 @@ This can take several forms:
     \item enumeration of multiple consistent explanations,
     \item separation of inference (what follows from the representation) from decision (what must be chosen under uncertainty).
 \end{itemize}
+
+In some cases, representation expansion is not simply a matter of adding more facts to the current context. The missing distinction may be available only through an external source, measurement procedure, institutional role, policy, or decision-maker. In such cases, an admissible response may route the query to the appropriate source, procedure, role, or authority rather than answer from the current representation. The relevant point is not social authority as such, but dependency status: the current representation does not contain the distinction, and the system must identify where that distinction could be preserved, reconstructed, or validated.
 
 The key requirement is that the system does not collapse indistinguishable states into a single unjustified conclusion.
 
@@ -594,6 +600,8 @@ Dependency-status distinctions can also be used before answer generation, as int
 
 On this view, question formation is itself a projection-management task. The user and system jointly determine which distinctions matter before inference proceeds. This is especially important in settings where the initial question collapses roles, scales, sources, or decision criteria that must remain separate for the answer to be admissible.
 
+In interactive systems, clarifying questions are one mechanism for representation repair. A clarification request is not merely conversational hesitation or a user-interface convenience. It is a way of enriching, refining, or changing the projection so that the requested query becomes identifiable, boundedly reconstructable, or explicitly conditional. Conversely, if the missing distinction does not affect the dependency status of the requested claim, the system should not treat clarification as required. The point is not to ask more questions, but to ask when the current representation does not support the requested answer form.
+
 \subsection{Audit and Dependency Status}
 
 Finally, the dependency-status ladder suggests audit fields for downstream systems. A claim can be marked according to whether its required dependency is preserved, reconstructable, traceable, or opaque. Such markings do not guarantee correctness, but they make visible whether a conclusion is supported by the representation, recovered through an explicit path, dependent on a recorded but unrecoverable relation, or unsupported by observable provenance.
@@ -601,6 +609,11 @@ Finally, the dependency-status ladder suggests audit fields for downstream syste
 This allows downstream users or systems to distinguish claims that are inferentially supported from claims that are merely decisions, assumptions, or unresolved dependencies under non-identifiability.
 
 These uses do not constitute a complete architecture or benchmark suite. They indicate how the structural account can guide downstream scaffolds, evaluation harnesses, runtime systems, interfaces, and audit mechanisms.
+
+\subsection{Future Applications and Interaction}
+
+\paragraph{Interaction and user modeling.}
+One downstream application concerns Theory-of-Mind-like behavior in AI systems. On the present account, such behavior can be understood as projection-sensitive modeling of another agent's representation: what the agent observes, assumes, wants, intends, or cannot distinguish. This does not require treating the system as having humanlike inner experience. It treats user modeling as another case of reasoning under projection, where claims about another agent's beliefs, goals, or emotional state should be marked according to whether they are preserved, reconstructable, traceable, or opaque.
 
 \section{Scope and Limits}
 
