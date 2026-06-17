@@ -1,6 +1,8 @@
 # Reasoning Under Projection
 
-Reasoning systems can fail not only because they infer incorrectly, but because they reason over representations that do not preserve the distinctions required for the query being answered.
+Reasoning systems can fail not only because they infer incorrectly, but because
+they reason over representations that do not preserve the distinctions required
+for the query being answered.
 
 This repository contains the paper:
 
@@ -10,50 +12,96 @@ This repository contains the paper:
 
 ## Summary
 
-This paper presents a conceptual and structural framework. It does not provide empirical evaluation, an inference-time intervention, or implementation-specific results; those are downstream work.
+This paper presents a conceptual and structural framework. It does not provide
+empirical evaluation, an inference-time intervention, or implementation-specific
+results; those are downstream work.
 
-Reasoning systems do not operate on full system state. They operate on representations: compressed, partial, task-shaped, or otherwise projected forms of a richer underlying situation. A representation may support some queries while failing to support others. When a distinction required by a query is not preserved, boundedly reconstructable, or explicitly assumed in the current representation, the result is representational loss.
+Reasoning systems do not operate on full system state. They operate on
+representations: compressed, partial, task-shaped, or otherwise projected forms
+of a richer underlying situation. A representation may support some queries while
+failing to support others. When a distinction required by a query is not
+preserved, boundedly reconstructable, or explicitly assumed in the current
+representation, the result is representational loss.
 
-The paper formalizes this problem using identifiability under projection. Given a projection from an underlying state space into a representation, a query is identifiable when it is constant over the equivalence classes induced by that projection. If the query is identifiable and the system answers incorrectly, the failure is error. If the query is not identifiable under the current representation, the failure is representational loss.
+The paper formalizes this problem using identifiability under projection. Given
+a projection from an underlying state space into a representation, a query is
+identifiable when it is constant over the equivalence classes induced by that
+projection. If the query is identifiable and the system answers incorrectly, the
+failure is error. If the query is not identifiable under the current
+representation, the failure is representational loss.
 
 This distinction gives the paper its central claim:
 
-> A recurring structural failure occurs when systems treat non-identifiability under projection as though it were recoverable inference error.
+> A recurring structural failure occurs when systems treat non-identifiability
+  under projection as though it were recoverable inference error.
 
-The claim is not that representational loss is the dominant source of reasoning failure. Rather, the paper identifies a recurring and structurally important failure mode that is often misclassified as ordinary error.
+The claim is not that representational loss is the dominant source of reasoning
+failure. Rather, the paper identifies a recurring and structurally important
+failure mode that is often misclassified as ordinary error.
 
-The paper also characterizes the **dependency status** of claims after projection: whether the distinctions required by a claim are preserved, reconstructable, traceable, or opaque.
+The paper also characterizes the **dependency status** of claims after
+projection: whether the distinctions required by a claim are preserved,
+reconstructable, traceable, or opaque. Dependency status also constrains response
+form: a system may answer directly, answer conditionally, branch over
+assumptions, request representation expansion, trace loss, weaken the claim,
+route to an appropriate source or procedure, or block the requested inference
+depending on what the current representation supports.
 
-It also identifies three structural constraints that help preserve and act on dependency status during reasoning:
+It also identifies three structural constraints that help preserve and act on
+dependency status during reasoning:
 
 * **Partial observability of loss-relevant state**
 * **Bounded correction**
 * **Non-collapse of distinct representational roles**
 
-These requirements are not claimed to be necessary and sufficient for all reliable reasoning under projection. They are failure-preserving constraints: observability addresses cases where unsupported dependencies become invisible; bounded correction addresses cases where a system silently changes the information basis of a claim; and non-collapse addresses cases where support at one representational level is treated as support at another.
+These requirements are not claimed to be necessary and sufficient for all
+reliable reasoning under projection. They are failure-preserving constraints:
+observability addresses cases where unsupported dependencies become invisible;
+bounded correction addresses cases where a system silently changes the
+information basis of a claim; and non-collapse addresses cases where support at
+one representational level is treated as support at another.
 
 ---
 
 ## Dependency Status
 
-For a query and a representation, **dependency status** refers to the kind of support the representation provides for the distinctions on which an answer depends. It is not identical to provenance, confidence, observability, or identifiability, although it may involve each of them.
+For a query and a representation, **dependency status** refers to the kind of
+support the representation provides for the distinctions on which an answer
+depends. It is not identical to provenance, confidence, observability, or
+identifiability, although it may involve each of them.
 
-The paper distinguishes several forms of support a representation may provide for a query:
+The paper distinguishes several forms of support a representation may provide
+for a query:
 
-* **Preserved** — the relevant distinction remains directly represented in a form sufficient for the query.
-* **Reconstructable** — the distinction is not directly represented, but can be recovered through an explicit bounded procedure using information available in the representation.
-* **Traceable** — the distinction cannot be recovered, but the dependency, assumption, source, transformation, or point of loss can be audited.
-* **Opaque** — the distinction is neither recoverable nor auditable from the current representation.
+* **Preserved** — the relevant distinction remains directly represented in a form
+  sufficient for the query.
+* **Reconstructable** — the distinction is not directly represented, but can be
+  recovered through an explicit bounded procedure using information available in
+  the representation.
+* **Traceable** — the distinction cannot be recovered, but the dependency,
+  assumption, source, transformation, or point of loss can be audited.
+* **Opaque** — the distinction is neither recoverable nor auditable from the
+  current representation.
 
-The boundary between reconstructable and traceable depends on whether the representation contains enough information to recover the distinction needed by the query, not merely enough information to identify where that distinction once came from. For example, a source hash, citation identifier, or provenance pointer may make a dependency traceable by recording that a claim depends on an external source. It is reconstructable only if the representation available to the reasoner also includes, retrieves, or otherwise supplies enough source content and recovery rules to determine the query-relevant distinction.
+The boundary between reconstructable and traceable depends on whether the
+representation contains enough information to recover the distinction needed by
+the query, not merely enough information to identify where that distinction once
+came from. For example, a source hash, citation identifier, or provenance pointer
+may make a dependency traceable by recording that a claim depends on an external
+source. It is reconstructable only if the representation available to the
+reasoner also includes, retrieves, or otherwise supplies enough source content
+and recovery rules to determine the query-relevant distinction.
 
-Preserved and reconstructable distinctions can support inference. Traceable distinctions support accountability for transformation or loss, but not recovery of the original relation. Opaque loss supports neither recovery nor audit.
+Preserved and reconstructable distinctions can support inference. Traceable
+distinctions support accountability for transformation or loss, but not recovery
+of the original relation. Opaque loss supports neither recovery nor audit.
 
 ---
 
 ## What Counts as the Representation?
 
-The representation is not limited to the prompt. It includes whatever representational state is available to the reasoning process, such as:
+The representation is not limited to the prompt. It includes whatever
+representational state is available to the reasoning process, such as:
 
 * prompt content
 * retrieved evidence
@@ -65,7 +113,9 @@ The representation is not limited to the prompt. It includes whatever representa
 * explicit assumptions
 * intermediate reasoning state, when represented
 
-The question is not simply whether a distinction is absent from the prompt. The question is whether the distinction is available, boundedly reconstructable, or explicitly assumed in the representation actually being used.
+The question is not simply whether a distinction is absent from the prompt. The
+question is whether the distinction is available, boundedly reconstructable, or
+explicitly assumed in the representation actually being used.
 
 ---
 
@@ -73,20 +123,30 @@ The question is not simply whether a distinction is absent from the prompt. The 
 
 When these constraints are respected, reasoning systems are expected to:
 
-* avoid presenting unsupported determinate answers as justified by the projection alone
+* avoid presenting unsupported determinate answers as justified by the projection
+  alone
 * preserve distinctions that would otherwise be collapsed
 * represent uncertainty explicitly when distinctions cannot be recovered
 * distinguish correction within a representation from representation expansion
-* separate inference from decision when action is required under non-identifiability
-* mark traceable or opaque dependencies rather than treating them as preserved or reconstructable
+* separate inference from decision when action is required under
+  non-identifiability
+* mark traceable or opaque dependencies rather than treating them as preserved or
+  reconstructable
+* select a response form licensed by dependency status, rather than treating
+  direct answers, conditional answers, clarification, tracing, weakening,
+  routing, or refusal as merely stylistic choices
 
-The result is not perfect reasoning, but reasoning that remains aligned with the information actually available in the representation.
+
+The result is not perfect reasoning, but reasoning that remains aligned with the
+information actually available in the representation.
 
 ---
 
 ## Who This Is For
 
-This paper is intended for engineers, researchers, and practitioners working on reasoning systems, AI evaluation, alignment, or reliability who want a structural account of why some reasoning failures persist even when outputs appear coherent.
+This paper is intended for engineers, researchers, and practitioners working on
+reasoning systems, AI evaluation, alignment, or reliability who want a structural
+account of why some reasoning failures persist even when outputs appear coherent.
 
 It may be especially relevant to work involving:
 
@@ -108,7 +168,8 @@ It may be especially relevant to work involving:
 
 ## Scope
 
-This work focuses on **structural properties of reasoning**, not specific implementations or evaluated systems.
+This work focuses on **structural properties of reasoning**, not specific
+implementations or evaluated systems.
 
 It is intended as a conceptual framework for understanding:
 
@@ -118,19 +179,36 @@ It is intended as a conceptual framework for understanding:
 * why output-level correctness alone may miss structural failure
 * why local coherence is not the same as structural admissibility
 
-The paper is strongest as a diagnostic and admissibility framework. It identifies a class of failures and the structural constraints relevant to them; it does not claim to explain all reasoning failures.
+The paper is strongest as a diagnostic and admissibility framework. It identifies
+a class of failures and the structural constraints relevant to them; it does not
+claim to explain all reasoning failures.
 
 ---
 
 ## Notes on Implementation and Evaluation
 
-Operational details such as prompt configurations, enforcement mechanisms, runtime architectures, or evaluation results are **not included** in this repository.
+Operational details such as prompt configurations, enforcement mechanisms,
+runtime architectures, or evaluation results are **not included** in this
+repository.
 
-This separation is intentional. The paper is designed to stand independently of any particular implementation and to describe constraints that apply across reasoning systems.
+This separation is intentional. The paper is designed to stand independently of
+any particular implementation and to describe constraints that apply across
+reasoning systems.
 
-Mechanism and evaluation are downstream tasks. A detector for representational loss would need to identify when a query depends on distinctions that are neither preserved, nor boundedly reconstructable, nor explicitly assumed in the current representation. A dependency-status implementation would need to represent whether a claim is preserved, reconstructable, traceable, or opaque. A benchmark would need to test whether a system distinguishes unsupported determinacy from ordinary error.
+Mechanism and evaluation are downstream tasks. A detector for representational
+loss would need to identify when a query depends on distinctions that are neither
+preserved, nor boundedly reconstructable, nor explicitly assumed in the current
+representation. A dependency-status implementation would need to represent
+whether a claim is preserved, reconstructable, traceable, or opaque. A benchmark
+would need to test whether a system distinguishes unsupported determinacy from
+ordinary error.
 
-One natural benchmark pattern is to compare behavior under paired compressed and enriched representations, testing whether the system changes its answer, qualifies its claim, branches over possibilities, or marks dependency status when the compressed representation does not preserve the distinctions required by the query.
+One natural benchmark pattern is to compare behavior under paired compressed and
+enriched representations, testing whether the system selects an admissible
+response form: changing its answer, qualifying its claim, branching over
+possibilities, requesting additional representation, routing to an appropriate
+source or procedure, or marking dependency status when the compressed
+representation does not preserve the distinctions required by the query.
 
 ---
 
@@ -144,9 +222,13 @@ Modern reasoning systems can produce outputs that are:
 
 Yet these outputs can still be structurally invalid.
 
-This occurs when systems answer as though the current representation preserves distinctions that it has actually collapsed. In such cases, the problem is not merely that the system made a bad inference. The requested query may not be identifiable from the representation being used.
+This occurs when systems answer as though the current representation preserves
+distinctions that it has actually collapsed. In such cases, the problem is not
+merely that the system made a bad inference. The requested query may not be
+identifiable from the representation being used.
 
-This framework makes that failure mode explicit and defines structural conditions for reasoning to remain aligned with the information it actually contains.
+This framework makes that failure mode explicit and defines structural conditions
+for reasoning to remain aligned with the information it actually contains.
 
 ---
 
@@ -162,7 +244,8 @@ If you find this work useful, you can cite it as:
 
 ```text
 Brian Cameron.
-Reasoning Under Projection: Error, Loss, and Structural Reliability in Compressed Representations.
+Reasoning Under Projection: Error, Loss, and Structural Reliability in Compressed
+Representations.
 2026.
 ```
 
