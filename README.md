@@ -1,20 +1,28 @@
 # Reasoning Under Projection
 
-Reasoning systems can fail not only because they infer incorrectly, but because
-they reason over representations that do not preserve the distinctions required
-for the query being answered.
+AI systems can fail not only because they infer incorrectly, but because they
+reason from compressed representations that do not preserve the distinctions
+required for safe action, source-grounded claims, security judgment, or
+root-cause analysis.
 
 This repository contains the paper:
 
-**Reasoning Under Projection: Error, Loss, and Structural Reliability in Compressed Representations**
+**Reasoning Under Projection: Error, Loss, and Structural Reliability in Compressed Representations**  
+*A Framework for AI Safety, Security Evaluation, and Agentic Reliability*
 
 ---
 
 ## Summary
 
-This paper presents a conceptual and structural framework. It does not provide
-empirical evaluation, an inference-time intervention, or implementation-specific
-results; those are downstream work.
+This paper presents a structural account of a recurring AI safety and reliability
+failure: a system presents a conclusion as supported by its current
+representation when the representation does not preserve the distinction required
+by the claim.
+
+This matters for systems that answer from prompts, summaries, retrieval results,
+logs, traces, metrics, policy artifacts, compressed context windows, or
+tool-mediated state. Such systems may produce outputs that are coherent and
+persuasive while still lacking structural support.
 
 Reasoning systems do not operate on full system state. They operate on
 representations: compressed, partial, task-shaped, or otherwise projected forms
@@ -22,6 +30,11 @@ of a richer underlying situation. A representation may support some queries whil
 failing to support others. When a distinction required by a query is not
 preserved, boundedly reconstructable, or explicitly assumed in the current
 representation, the result is representational loss.
+
+When loss occurs, a reliable system must change the information basis or answer
+form: for example by qualifying the claim, branching over assumptions, requesting
+additional representation, routing to an appropriate source or procedure, or
+refusing the requested inference.
 
 The paper formalizes this problem using identifiability under projection. Given
 a projection from an underlying state space into a representation, a query is
@@ -142,27 +155,49 @@ information actually available in the representation.
 
 ---
 
+## AI Safety and Security Relevance
+
+The framework is intended to help analyze and evaluate failures such as:
+
+* unsupported root-cause attribution in incident response
+* hallucinated or weakly grounded source support in RAG systems
+* security recommendations made without the relevant code path, configuration, or threat model
+* agentic actions taken from compressed or incomplete state
+* policy or deployment decisions that collapse reversibility, uncertainty, and residual risk into a single score
+* user-modeling or Theory-of-Mind-like claims that overstate what can be inferred from partial interaction traces
+
+The central safety question is whether a system can distinguish what its representation preserves, what it can reconstruct, what it can merely trace, and what it has lost.
+
+---
+
 ## Who This Is For
 
 This paper is intended for engineers, researchers, and practitioners working on
-reasoning systems, AI evaluation, alignment, or reliability who want a structural
-account of why some reasoning failures persist even when outputs appear coherent.
+AI safety, AI security, reasoning systems, agentic reliability, RAG/source
+grounding, evaluation, alignment, or audit who want a structural account of why
+some failures persist even when outputs appear coherent.
 
 It may be especially relevant to work involving:
 
+* AI safety and security evaluation
+* incident-response and root-cause analysis assistants
+* security copilots and code assistants
+* retrieval-augmented generation and source grounding
+* agentic systems acting from compressed state
+* user modeling and Theory-of-Mind-like inference
 * abstraction and state compression
-* source-grounded reasoning
 * benchmark and evaluation design
 * partial observability
 * scalable oversight
 * proxy metrics and Goodhart-style failures
-* AI systems that must distinguish inference from decision under uncertainty
+* systems that must distinguish inference from decision under uncertainty
 
 ---
 
 ## What This Repository Contains
 
-* [reasoning-under-projection.pdf](reasoning-under-projection.pdf) — the full paper
+* [reasoning-under-projection.pdf](reasoning-under-projection.pdf) — the full
+  paper on error, loss, dependency status, and AI safety/security evaluation
 
 ---
 
@@ -181,7 +216,8 @@ It is intended as a conceptual framework for understanding:
 
 The paper is strongest as a diagnostic and admissibility framework. It identifies
 a class of failures and the structural constraints relevant to them; it does not
-claim to explain all reasoning failures.
+claim to explain all reasoning failures or provide empirical evaluation,
+inference-time interventions, or implementation-specific results.
 
 ---
 
@@ -209,26 +245,6 @@ response form: changing its answer, qualifying its claim, branching over
 possibilities, requesting additional representation, routing to an appropriate
 source or procedure, or marking dependency status when the compressed
 representation does not preserve the distinctions required by the query.
-
----
-
-## Why This Matters
-
-Modern reasoning systems can produce outputs that are:
-
-* coherent
-* confident
-* internally consistent
-
-Yet these outputs can still be structurally invalid.
-
-This occurs when systems answer as though the current representation preserves
-distinctions that it has actually collapsed. In such cases, the problem is not
-merely that the system made a bad inference. The requested query may not be
-identifiable from the representation being used.
-
-This framework makes that failure mode explicit and defines structural conditions
-for reasoning to remain aligned with the information it actually contains.
 
 ---
 
@@ -260,6 +276,7 @@ This paper is part of an ongoing line of work exploring:
 * dependency-status tracking
 * structural constraints for reasoning under projection
 * structural evaluation of reasoning systems
+* AI safety and security evaluation under compressed or partial state
 
 Additional artifacts and implementations may be released as this work develops.
 
