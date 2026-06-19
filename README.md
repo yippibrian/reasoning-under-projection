@@ -52,13 +52,16 @@ The claim is not that representational loss is the dominant source of reasoning
 failure. Rather, the paper identifies a recurring and structurally important
 failure mode that is often misclassified as ordinary error.
 
-The paper also characterizes the **dependency status** of claims after
-projection: whether the distinctions required by a claim are preserved,
-reconstructable, traceable, or opaque. Dependency status also constrains response
-form: a system may answer directly, answer conditionally, branch over
-assumptions, request representation expansion, trace loss, weaken the claim,
-route to an appropriate source or procedure, or block the requested inference
-depending on what the current representation supports.
+The paper derives the **dependency status** of claims after projection from the
+answer forms licensed by the current representation. For a claim depending on a
+distinction, the system must determine whether that distinction is directly
+available for inference, recoverable by a bounded procedure, only recorded as a
+dependency, or unavailable even for audit. These cases correspond to preserved,
+reconstructable, traceable, and opaque dependency status. The ladder is not a
+complete ontology of epistemic states; it is a minimal operational partition for
+deciding whether the system may answer directly, reconstruct procedurally, mark
+or route a dependency, qualify the claim, request representation expansion, or
+refuse the requested inference.
 
 It also identifies three structural constraints that help preserve and act on
 dependency status during reasoning:
@@ -68,11 +71,12 @@ dependency status during reasoning:
 * **Non-collapse of distinct representational roles**
 
 These requirements are not claimed to be necessary and sufficient for all
-reliable reasoning under projection. They are failure-preserving constraints:
-observability addresses cases where unsupported dependencies become invisible;
-bounded correction addresses cases where a system silently changes the
-information basis of a claim; and non-collapse addresses cases where support at
-one representational level is treated as support at another.
+reliable reasoning under projection. They are failure-preserving constraints
+because they block three generic routes by which unsupported dependency status
+can be promoted into apparently supported inference: unsupported dependencies can
+remain invisible, repair can silently strengthen traceable or opaque loss into
+apparent reconstruction, and support can be transferred from one representational
+level to another.
 
 ---
 
@@ -85,6 +89,13 @@ identifiability, although it may involve each of them.
 
 The paper distinguishes several forms of support a representation may provide
 for a query:
+
+| Status | Support in the representation | Licensed answer forms |
+|---|---|---|
+| Preserved | Distinction directly represented | Direct answer, ordinary correction |
+| Reconstructable | Bounded recovery path available | Reconstruction, procedural answer |
+| Traceable | Dependency recorded but not recoverable | Mark, qualify, route, audit |
+| Opaque | Dependency unavailable or unauditable | Request expansion, route, defer, or refuse form |
 
 * **Preserved** — the relevant distinction remains directly represented in a form
   sufficient for the query.
@@ -152,6 +163,35 @@ When these constraints are respected, reasoning systems are expected to:
 
 The result is not perfect reasoning, but reasoning that remains aligned with the
 information actually available in the representation.
+
+---
+
+## Testable Consequences
+
+The framework predicts several evaluation patterns.
+
+* **Representation-enrichment sensitivity** — if an enriched representation
+  restores a distinction that was collapsed in a compressed representation, a
+  projection-aware system should become more willing to make determinate claims.
+  Under the compressed representation, it should qualify, branch, request
+  representation expansion, or mark the dependency.
+
+* **Traceability is not reconstruction** — adding a citation identifier,
+  provenance pointer, source hash, or tool trace may make a dependency traceable,
+  but it does not make the claim reconstructable unless the representation also
+  supplies enough source content or recovery rules to determine the relevant
+  distinction.
+
+* **Answer-form sensitivity** — evaluation should score not only whether an
+  answer is plausible or correct-looking, but whether its form is licensed by the
+  dependency status of the claim. A direct answer, conditional answer, routed
+  answer, clarification request, trace marking, and refusal are not merely
+  stylistic variants.
+
+* **Compressed/enriched diagnostic contrast** — benchmarks can compare paired
+  tasks that differ only in whether the query-relevant distinction is
+  represented. A system that gives the same determinate answer form in both
+  conditions is failing to regulate claims by dependency status.
 
 ---
 
@@ -245,6 +285,12 @@ response form: changing its answer, qualifying its claim, branching over
 possibilities, requesting additional representation, routing to an appropriate
 source or procedure, or marking dependency status when the compressed
 representation does not preserve the distinctions required by the query.
+
+This paper is the conceptual foundation for companion work on structural
+evaluation and admissibility-kernel prompting. Those downstream artifacts treat
+the ideas here as evaluation targets: loss visibility, bounded correction,
+error--loss distinction, non-collapse, dependency-status labeling, and
+answer-form admissibility.
 
 ---
 
