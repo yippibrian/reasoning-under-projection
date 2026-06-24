@@ -23,7 +23,7 @@ AI systems increasingly make recommendations, explanations, security judgments, 
 
 This paper identifies a structural failure mode in AI reasoning systems: non-identifiability under projection is misclassified as recoverable inference error. In such cases, additional reasoning over the same representation can make an answer more fluent, coherent, or persuasive without restoring the missing distinction. This produces familiar safety and security failures: unsupported root-cause attribution, hallucinated source support, unsafe action under missing state, and metric-driven proxy success, a failure mode related to Goodhart-style proxy collapse~\cite{Goodhart1975}.
 
-The paper distinguishes error, which is correctable within the current representation, from loss, which requires changing the information basis or answer form. It then introduces a dependency-status ladder organized by the answer forms licensed after projection: preserved, reconstructible, traceable, or opaque. Finally, it describes structural requirements for reliable reasoning under compression: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels.
+The paper distinguishes error, which is correctable within the current representation, from loss, which reflects failure of query-relative sufficiency and requires changing the information basis or answer form. It then introduces a dependency-status ladder organized by the answer forms licensed after projection: preserved, reconstructible, traceable, or opaque. Finally, it describes structural requirements for reliable reasoning under compression: observability of loss-relevant state, bounded correction, and non-collapse of distinct representational levels.
 
 The goal is not to eliminate uncertainty or require abstention. It is to ensure that reasoning systems do not present conclusions as determined by a representation when the representation does not support them. The resulting admissibility framework treats response form as part of structural reliability: a system should answer directly when support is preserved, reconstruct when bounded recovery is available, mark or route traceable dependencies, and refuse or reformulate claims whose dependencies are opaque. This paper develops the conceptual framework and identifies several directions for future formalization, operationalization, and evaluation.
 \end{abstract}
@@ -71,6 +71,8 @@ where $S$ is the full system state and $R$ is the representation used for reason
 
 Multiple distinct states in $S$ may map to the same representation in $R$.
 
+In information-theoretic terms, $R$ can be treated as the information basis available to the reasoner after projection. The relevant question is not whether $R$ contains less information than $S$ in general, but whether it retains the information needed to answer the query at hand. A representation may be highly compressed and still sufficient for one query, while being insufficient for another query that depends on a collapsed distinction.
+
 A simple example illustrates the query-relative nature of projection. A black-and-white image may preserve shape while losing color. It remains admissible for many shape queries, but not for a query that depends on whether an object was red or green. The projection is not defective in general; it is insufficient for queries whose answers depend on the collapsed distinction.
 
 In this paper, projection refers specifically to transformations that induce non-trivial equivalence classes over the underlying state space: distinct states in $S$ are mapped to the same representation in $R$.
@@ -107,7 +109,7 @@ If this condition holds, then the representation preserves enough information to
 
 This gives a compact way to state the error--loss distinction. An error occurs when $q$ is identifiable under the projection but the reasoning process returns the wrong value. Loss occurs when $q$ is not identifiable under the projection, so the representation itself no longer supports a determinate answer.
 
-In more familiar statistical and information-theoretic terms, error is a recoverable inference or estimation failure within an information basis that is sufficient for the query. Loss is a failure of sufficiency: the projection has discarded task-relevant information needed to distinguish states with different values of $q$.
+In more familiar statistical and information-theoretic terms, error is a recoverable inference or estimation failure within an information basis that is sufficient for the query. Loss is a failure of sufficiency: the projection has discarded task-relevant information needed to distinguish states with different values of $q$. Equivalently, the projected representation is not a query-relative sufficient statistic for $q$.
 
 \paragraph{Minimal example.}
 Let $S=\{s_1,s_2\}$ and let $P(s_1)=P(s_2)=r$. Let $q(s_1)=0$ and $q(s_2)=1$. Then $q$ is not identifiable under $P$, because the same representation $r$ requires two different answers. No function $f:R\rightarrow A$ can recover $q$, since $f(r)$ must return a single value. If instead $q(s_1)=q(s_2)$, then $q$ is identifiable under $P$ even though $P$ collapses the two states.
@@ -227,6 +229,8 @@ The four statuses are derived from the operations available to a reasoner after 
 
 Thus the ladder is not intended as a complete ontology of epistemic states or a claim that all support relations are cleanly ordered. It is a minimal operational partition induced by answer-form admissibility: direct inference, bounded reconstruction, trace-only accountability, and unsupported or opaque dependency. More fine-grained statuses such as probabilistic reconstruction, partial reconstruction, conflicting provenance, or prior-dependent inference refine these cases rather than replace the need to distinguish among them.
 
+In information-theoretic language, the ladder distinguishes different kinds of information support after projection. Preserved distinctions remain directly encoded in $R$. Reconstructible distinctions are recoverable by a bounded decoding or derivation procedure from $R$. Traceable distinctions are represented only as provenance, dependency, or pointer information. Opaque distinctions are absent even as auditable dependencies. The ladder therefore separates having information about a dependency from having enough information to recover the distinction on which the claim depends.
+
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
@@ -325,11 +329,13 @@ Without observability, the system cannot distinguish between an identifiable que
 
 If such conditions are not observable within the system, they are effectively treated as resolved, even when they are not. This leads to outputs that appear complete but are based on unacknowledged gaps.
 
-Observability does not require recovery of the missing information. It requires that detectable limits remain represented as limits. Failure of observability produces hidden loss: the system proceeds as if all relevant distinctions were present even when the representation no longer supports them.
+Observability does not require recovery of the missing information. In information-theoretic terms, it requires preserving enough side information about the projection, metadata, provenance, missing variables, ambiguity, or unsupported assumptions to represent detectable insufficiency as insufficiency. Failure of observability produces hidden loss: the system proceeds as if all relevant distinctions were present even when the representation no longer supports them.
 
 \subsection{Bounded Correction}
 
 Correction is bounded relative to a projection $P:S\rightarrow R$ when it can revise an incorrect result using only distinctions encoded in the representational state $R$. Here $R$ includes not only object-level data, but any explicitly represented metadata, provenance information, uncertainty markers, priors, task constraints, or assumptions available to the reasoning process. If correction requires distinguishing between states that are equivalent under $P$ and not distinguished anywhere in $R$, then the problem is not ordinary error correction within the representation. It requires representation expansion, new information, or an explicit assumption that changes the representational state.
+
+Equivalently, bounded correction prohibits unmarked information gain during repair. A correction step may reduce error by recomputing, rechecking, or reorganizing information already available in $R$, but it cannot restore query-relevant distinctions erased by $P$. If the repaired answer depends on such a distinction, then the system has either moved to a richer representation $R'$, invoked an external source, or introduced an assumption. Such moves may be admissible, but they must be marked as changes to the information basis rather than presented as ordinary correction within $R$.
 
 The important point is not that correction must be small in a purely computational sense. It is bounded when the correction is licensed by distinctions already encoded in $R$, or by an explicit refinement that produces a new representation $R'$. A correction that silently imports distinctions not encoded in $R$ is not correction within $R$; it is an unmarked transition to a different representational state. For example, recomputing a formula from the same represented table is bounded correction; inventing a missing variable needed by the formula is not.
 
@@ -359,6 +365,8 @@ In particular, the system must not collapse:
     \item an intermediate reasoning state with a final conclusion,
     \item a selected explanation with the full set of explanations consistent with the representation.
 \end{itemize}
+
+Equivalently, bounded correction prohibits unmarked information gain during repair. A correction step may reduce error by recomputing, rechecking, or reorganizing information already available in $R$, but it cannot restore query-relevant distinctions erased by $P$. If the repaired answer depends on such a distinction, then the system has either moved to a richer representation $R'$, invoked an external source, or introduced an assumption. Such moves may be admissible, but they must be marked as changes to the information basis rather than presented as ordinary correction within $R$.
 
 In each case, the collapse has the same form: a projected object is treated as if it had the role or authority of a richer object. A representation is treated as the world, a partial reasoning state as a conclusion, or one admissible model as the uniquely supported model. This makes projection loss invisible because the system can no longer track which distinctions were removed at which stage.
 
@@ -448,6 +456,8 @@ This does not mean optimization, prompting, or evaluation are misguided. It mean
 \section{Relation to Existing Frameworks}
 
 The argument in this paper overlaps with several established lines of work. In statistics and causal inference, identifiability asks whether a target quantity can be determined from the available observational structure \cite{Pearl2009}. In statistical decision theory, comparison of experiments and sufficiency ask when one signal or observation preserves enough information for a class of decisions \cite{Blackwell1953}. In partially observable decision processes, agents must act over incomplete state representations \cite{Kaelbling1998}. In work on state abstraction, compressed states are evaluated by whether they preserve value, policy, reward, transition, or model-relevant properties \cite{Li2006}. In formal methods and abstract interpretation, abstraction maps concrete states into reduced domains while preserving selected properties \cite{Cousot1977}; counterexample-guided abstraction refinement studies how an abstraction may be refined when it is too coarse for the property being checked \cite{Clarke2000}. In information-theoretic approaches such as the information bottleneck, compressed representations are evaluated by what task-relevant information they retain \cite{Tishby1999}.
+
+The present framework is closest to these traditions when it treats projection failure as a failure of query-relative sufficiency, but it differs by linking that failure to answer-form governance.
 
 This distinction is especially important for partial-observation models. Partial-observation methods, including POMDP-style accounts, can represent uncertainty over hidden states and help identify ambiguity, underspecification, or missing evidence. But hidden state is not the same as projected-away structure. A distinction may be unavailable from the current representation rather than merely unknown within it. Sensing hiddenness can indicate that the representation is incomplete; reconstructibility governance determines whether the claim remains admissible, must be weakened, requires representation expansion, can be traced, or should be blocked.
 
@@ -544,7 +554,7 @@ The practical target is therefore improved loss visibility, not complete loss de
 
 \section{Conclusion}
 
-AI systems reason from compressed representations: prompts, summaries, retrieved snippets, tool outputs, logs, metrics, memory, and policy artifacts. Compression is unavoidable, but it can collapse distinctions that later claims require. When a query is not identifiable under the current representation, additional reasoning over that representation cannot recover the missing distinction.
+AI systems reason from compressed representations: prompts, summaries, retrieved snippets, tool outputs, logs, metrics, memory, and policy artifacts. Compression is unavoidable, but it can collapse distinctions that later claims require. When a query is not identifiable under the current representation, additional reasoning over that representation cannot recover the missing distinction. Put informationally, the missing distinction is not available for decoding from the current information basis.
 
 The central error analyzed in this paper is misclassifying representational loss as recoverable inference error. This produces fluent but unsupported determinacy: hallucinated source support, overconfident root-cause attribution, unsafe action under missing state, or metric success that hides loss of relevant structure.
 
