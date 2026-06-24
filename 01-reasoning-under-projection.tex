@@ -5,6 +5,8 @@
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
 
 \title{Reasoning Under Projection:\\
 Structural Failure Modes and the Admissibility Framework}
@@ -17,7 +19,7 @@ Structural Failure Modes and the Admissibility Framework}
 \maketitle
 
 \begin{abstract}
-AI systems increasingly make recommendations, explanations, security judgments, and agentic decisions from compressed representations: prompts, summaries, retrieved snippets, logs, metrics, traces, policy artifacts, and interface-bounded context. These representations often omit or collapse distinctions that remain operationally relevant. The relevant failure is a failure of invariant preservation: the dependency structure required by a downstream claim no longer survives projection in a form that supports the requested answer. When a downstream claim depends on a distinction that the representation does not preserve or make boundedly recoverable, the failure is not merely uncertainty or correctable error. It is representational loss.
+AI systems increasingly make recommendations, explanations, security judgments, and agentic decisions from compressed representations: prompts, summaries, retrieved snippets, logs, metrics, traces, policy artifacts, and interface-bounded context. These representations often omit or collapse distinctions that remain operationally relevant. The relevant failure is a failure of invariant preservation: the dependency structure required by a downstream claim no longer survives projection in a form that supports the requested answer. When a downstream claim depends on a distinction that the representation does not preserve or make boundedly recoverable, the failure is not merely uncertainty or correctable inference error. It is task-relevant representational loss: loss of information needed to distinguish states that require different answers to the query.
 
 This paper identifies a structural failure mode in AI reasoning systems: non-identifiability under projection is misclassified as recoverable inference error. In such cases, additional reasoning over the same representation can make an answer more fluent, coherent, or persuasive without restoring the missing distinction. This produces familiar safety and security failures: unsupported root-cause attribution, hallucinated source support, unsafe action under missing state, and metric-driven proxy success, a failure mode related to Goodhart-style proxy collapse~\cite{Goodhart1975}.
 
@@ -59,7 +61,7 @@ For language models, the operative representation is not simply the user prompt.
 
 \subsection{Projection as Compression}
 
-We define \emph{projection} as any transformation that maps a richer system state into a reduced representation used for reasoning. Projection may be lossy in the information-theoretic sense \cite{Shannon1948}, but the relevant issue for reasoning is whether the reduced representation preserves the distinctions required for later inference, decision, or evaluation.
+We define \emph{projection} as any transformation that maps a richer system state into a reduced representation used for reasoning. Projection may be lossy in the information-theoretic sense \cite{Shannon1948}, but the relevant issue for reasoning is whether the reduced representation preserves the distinctions required for later inference, decision, or evaluation. Equivalently, the concern is not compression as such, but whether the projection discards task-relevant sufficient information for the query being asked.
 
 Formally, projection can be understood as a mapping:
 \[
@@ -104,6 +106,8 @@ The use of identifiability here generalizes the term beyond parameter recovery i
 If this condition holds, then the representation preserves enough information to answer $q$. If the condition fails, then two states that are indistinguishable in the representation require different answers to $q$. In that case, no reasoning process operating only on $R$ can determine $q$ without introducing additional assumptions, expanding the representation, or obtaining new information.
 
 This gives a compact way to state the error--loss distinction. An error occurs when $q$ is identifiable under the projection but the reasoning process returns the wrong value. Loss occurs when $q$ is not identifiable under the projection, so the representation itself no longer supports a determinate answer.
+
+In more familiar statistical and information-theoretic terms, error is a recoverable inference or estimation failure within an information basis that is sufficient for the query. Loss is a failure of sufficiency: the projection has discarded task-relevant information needed to distinguish states with different values of $q$.
 
 \paragraph{Minimal example.}
 Let $S=\{s_1,s_2\}$ and let $P(s_1)=P(s_2)=r$. Let $q(s_1)=0$ and $q(s_2)=1$. Then $q$ is not identifiable under $P$, because the same representation $r$ requires two different answers. No function $f:R\rightarrow A$ can recover $q$, since $f(r)$ must return a single value. If instead $q(s_1)=q(s_2)$, then $q$ is identifiable under $P$ even though $P$ collapses the two states.
@@ -157,7 +161,7 @@ The practical implication is that a reasoning system must either change the info
 
 The failures described in the previous sections arise from a single structural confusion: the treatment of representational loss as if it were recoverable error. Distinguishing between these two cases is necessary for any reasoning process that operates over projected representations.
 
-Using the notation above, error concerns failures in answering an identifiable query; loss concerns cases where the query is not identifiable from the current representation. The distinction matters because treating the second case as the first leads systems to repair, infer, or explain beyond what the representation supports.
+Using the notation above, error concerns failures in answering an identifiable query; loss concerns cases where the query is not identifiable from the current representation. The distinction matters because treating the second case as the first leads systems to repair, infer, or explain beyond what the representation supports. The term ``loss'' is not used here to mean training loss, prediction loss, or a decision-theoretic loss function. It refers to loss of query-relevant distinguishing information under projection.
 
 \subsection{Error: Recoverable Deviation Within a Representation}
 
@@ -176,11 +180,11 @@ In each case, the distinction between correct and incorrect outcomes exists with
 
 \subsection{Loss: Non-Identifiability Under the Current Representation}
 
-A \emph{loss} occurs when the representation no longer contains, or cannot validly reconstruct, the information required to distinguish between multiple operationally relevant underlying states. In this case, no reasoning process operating solely on the current representation can recover the missing distinction without additional assumptions, representation expansion, or external information.
+A \emph{loss}, more precisely task-relevant representational loss, occurs when the representation no longer contains, or cannot validly reconstruct, the information required to distinguish between multiple operationally relevant underlying states. In this case, no reasoning process operating solely on the current representation can recover the missing distinction without additional assumptions, representation expansion, or external information.
 
 The term ``loss'' is used here as a query-relative category rather than as a claim that all missing structure has the same cause. A query may become non-identifiable because relevant variables are absent, because multiple causal models remain observationally equivalent, because a metric collapses distinct evaluative dimensions, because provenance is unavailable, or because source-level support is not represented. These mechanisms differ, but they share the same operational consequence: the current representation does not preserve enough structure to determine the requested query without additional assumptions, representation expansion, or external information.
 
-Loss names a structural condition of projection rather than an inference failure: once distinct states have been mapped to the same representation, they are indistinguishable from the perspective of the reasoning system.
+Loss names a structural condition of projection rather than an inference failure: once distinct states have been mapped to the same representation, they are indistinguishable from the perspective of the reasoning system. In this sense, loss is closer to non-identifiability or failure of query-relative sufficiency than to high variance, low confidence, or ordinary prediction error.
 
 Typical examples include:
 \begin{itemize}[leftmargin=1.5em]
@@ -223,9 +227,45 @@ The four statuses are derived from the operations available to a reasoner after 
 
 Thus the ladder is not intended as a complete ontology of epistemic states or a claim that all support relations are cleanly ordered. It is a minimal operational partition induced by answer-form admissibility: direct inference, bounded reconstruction, trace-only accountability, and unsupported or opaque dependency. More fine-grained statuses such as probabilistic reconstruction, partial reconstruction, conflicting provenance, or prior-dependent inference refine these cases rather than replace the need to distinguish among them.
 
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.9cm,
+    status/.style={
+        draw,
+        rounded corners,
+        align=center,
+        minimum width=4.2cm,
+        minimum height=0.8cm
+    },
+    question/.style={
+        align=center,
+        font=\small
+    },
+    arrow/.style={-{Latex[length=2mm]}, thick}
+]
+
+\node[question] (claim) {Claim depends on distinction $d$};
+\node[status, below=of claim] (preserved) {\textbf{Preserved}\\$d$ is directly represented\\Direct answer licensed};
+\node[status, below=of preserved] (reconstructible) {\textbf{Reconstructible}\\$d$ has a bounded recovery path\\Reconstruction or procedural answer licensed};
+\node[status, below=of reconstructible] (traceable) {\textbf{Traceable}\\dependency is recorded but not recoverable\\Mark, qualify, route, or audit};
+\node[status, below=of traceable] (opaque) {\textbf{Opaque}\\dependency is unavailable or unauditable\\Request expansion, defer, route, or refuse form};
+
+\draw[arrow] (claim) -- node[right, font=\scriptsize] {after projection} (preserved);
+\draw[arrow] (preserved) -- node[right, font=\scriptsize] {if not preserved} (reconstructible);
+\draw[arrow] (reconstructible) -- node[right, font=\scriptsize] {if not reconstructible} (traceable);
+\draw[arrow] (traceable) -- node[right, font=\scriptsize] {if not traceable} (opaque);
+
+\end{tikzpicture}
+\caption{Dependency-status degradation under projection. As support weakens, admissible answer forms must also weaken.}
+\label{fig:dependency_status_ladder}
+\end{figure}
+
+Figure~\ref{fig:dependency_status_ladder} visualizes the degradation path described in Table~\ref{tab:dependency_status_answer_forms}: as a query-relevant distinction moves downward from preserved to opaque, the response form must weaken from direct inference to reconstruction, trace marking, routing, deferral, or refusal of the requested form.
+
 \begin{table}[h]
 \centering
-\caption{Dependency status and licensed answer forms.}
+\caption{Dependency status, representational support, and licensed answer forms.}
 \label{tab:dependency_status_answer_forms}
 \begin{tabular}{lll}
 \toprule
@@ -238,8 +278,6 @@ Opaque & Dependency unavailable or unauditable & Request expansion, route, defer
 \bottomrule
 \end{tabular}
 \end{table}
-
-The status of a query-relevant distinction after projection can therefore be characterized by a base degradation ladder, often with qualifiers in practical systems.
 
 A distinction is \emph{preserved} when it remains directly represented in $R$ in a form sufficient for the query. A distinction is \emph{reconstructible} when it is not directly represented as an object-level feature, but can be recovered through an explicit bounded procedure using information available in $R$. A distinction is \emph{traceable} when $R$ records that a claim depends on a source, assumption, transformation, or lost relation, but does not contain enough information to recover the distinction itself. A distinction is \emph{opaque} when the dependency is neither recoverable nor auditable from the representation.
 
