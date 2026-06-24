@@ -7,7 +7,7 @@ LATEXMK_FLAGS := -pdf -interaction=nonstopmode -halt-on-error
 
 # All canonical .tex entry points
 TEX_FILES := \
-	reasoning-under-projection.tex
+	01-reasoning-under-projection.tex
 
 PDF_FILES := $(TEX_FILES:.tex=.pdf)
 
