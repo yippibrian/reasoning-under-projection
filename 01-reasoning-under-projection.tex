@@ -307,7 +307,7 @@ The requirements in this section are introduced as conceptual design constraints
 
 The formal result above does not by itself specify a complete reasoning policy. It specifies a dependency problem: after projection, a claim may be supported by distinctions that are preserved, reconstructible, merely traceable, or opaque. A structurally reliable reasoning process must therefore avoid treating these dependency statuses as interchangeable.
 
-These requirements are privileged only in a limited sense: they correspond to three generic ways that dependency status can be misrepresented after projection. First, the status of a dependency may fail to become visible at all; this motivates observability of loss-relevant state. Second, the system may silently strengthen the status of a dependency during repair, treating traceable or opaque loss as if it had become reconstructible; this motivates bounded correction. Third, the system may transfer support across representational levels, treating support for a representation, proxy, intermediate state, or selected explanation as support for the underlying system or final claim; this motivates non-collapse of distinct levels.
+These requirements are privileged only in a limited sense: they correspond to three generic ways that dependency status can be misrepresented after projection. First, the status of a dependency may fail to become visible at all; this motivates observability of loss-relevant state. Second, the system may silently strengthen the status of a dependency during repair, treating traceable or opaque loss as if it had become reconstructible; this motivates bounded correction. Third, the system may transfer dependency status across representational levels, treating support for a representation, proxy, intermediate state, provenance pointer, metric, or selected explanation as support for the underlying system or final claim; this motivates non-collapse of distinct levels.
 
 Other mechanisms, such as calibration, provenance preservation, abstraction refinement, uncertainty representation, and compositional consistency, remain important. On this account, they are not rivals to the three requirements. They are implementation mechanisms, refinements, or domain-specific specializations. The three requirements are singled out because each blocks a distinct generic route by which unsupported dependency status can be promoted into apparently supported inference. The three requirements below should therefore be read as failure-preserving constraints rather than as a complete theory of reliable reasoning.
 
@@ -335,7 +335,7 @@ Observability does not require recovery of the missing information. In informati
 
 Correction is bounded relative to a projection $P:S\rightarrow R$ when it can revise an incorrect result using only distinctions encoded in the representational state $R$. Here $R$ includes not only object-level data, but any explicitly represented metadata, provenance information, uncertainty markers, priors, task constraints, or assumptions available to the reasoning process. If correction requires distinguishing between states that are equivalent under $P$ and not distinguished anywhere in $R$, then the problem is not ordinary error correction within the representation. It requires representation expansion, new information, or an explicit assumption that changes the representational state.
 
-Equivalently, bounded correction prohibits unmarked information gain during repair. A correction step may reduce error by recomputing, rechecking, or reorganizing information already available in $R$, but it cannot restore query-relevant distinctions erased by $P$. If the repaired answer depends on such a distinction, then the system has either moved to a richer representation $R'$, invoked an external source, or introduced an assumption. Such moves may be admissible, but they must be marked as changes to the information basis rather than presented as ordinary correction within $R$.
+While bounded correction concerns preserving the information basis during revision, non-collapse concerns preserving the role distinctions among representational objects. A system may satisfy bounded correction yet still collapse levels by treating a representation as equivalent to the system it represents, or by treating a selected explanation as uniquely determined by the available evidence.
 
 The important point is not that correction must be small in a purely computational sense. It is bounded when the correction is licensed by distinctions already encoded in $R$, or by an explicit refinement that produces a new representation $R'$. A correction that silently imports distinctions not encoded in $R$ is not correction within $R$; it is an unmarked transition to a different representational state. For example, recomputing a formula from the same represented table is bounded correction; inventing a missing variable needed by the formula is not.
 
@@ -357,18 +357,25 @@ Failure of bounded correction leads to systems that appear to improve through re
 
 \subsection{Non-Collapse of Distinct Levels}
 
-A reasoning system must preserve role distinctions between objects that occupy different positions in the reasoning process. The relevant invariant is not that all levels have the same structure, but that objects with different roles must not be treated as interchangeable merely because they coincide under projection.
+\subsection{Non-Collapse of Distinct Levels}
+
+A reasoning system must preserve role distinctions between objects that occupy different positions in the reasoning process. In dependency-status terms, non-collapse requires that support not be transferred across representational levels unless the dependency licensing that transfer is itself preserved, boundedly reconstructible, or explicitly conditioned. A representation may support a claim about the representation without supporting the same claim about the underlying system. A proxy may support a claim about the proxy without supporting the same claim about the target. A selected explanation may be consistent with the represented evidence without being uniquely licensed by it.
+
+The relevant invariant is therefore not that all levels have the same structure, but that dependency status must not be silently promoted across levels. A preserved dependency at one level must not be treated as preserved at another level unless the relation between those levels is also preserved or reconstructible. Likewise, a traceable or opaque dependency must not become apparently reconstructed merely because it is attached to a fluent explanation, a metric, a provenance pointer, a selected model, or an aggregate representation.
 
 In particular, the system must not collapse:
 \begin{itemize}[leftmargin=1.5em]
-    \item a representation with the underlying system it represents,
-    \item an intermediate reasoning state with a final conclusion,
-    \item a selected explanation with the full set of explanations consistent with the representation.
+\item a representation with the underlying system it represents,
+\item a proxy or metric with the target property it measures,
+\item a provenance pointer with recoverable source support,
+\item an intermediate reasoning state with a final conclusion,
+\item a selected explanation with the full set of explanations consistent with the representation,
+\item a local component-level judgment with a claim about the composed system.
 \end{itemize}
 
-Equivalently, bounded correction prohibits unmarked information gain during repair. A correction step may reduce error by recomputing, rechecking, or reorganizing information already available in $R$, but it cannot restore query-relevant distinctions erased by $P$. If the repaired answer depends on such a distinction, then the system has either moved to a richer representation $R'$, invoked an external source, or introduced an assumption. Such moves may be admissible, but they must be marked as changes to the information basis rather than presented as ordinary correction within $R$.
+In information-theoretic terms, non-collapse preserves boundaries between information available about different objects or levels. Information about a representation is not automatically information about the underlying system. Information about a proxy is not automatically information about the target property. Information about one selected reconstruction is not automatically information about all states consistent with the representation. Non-collapse prevents support from being transferred across these boundaries without preserving the dependency that licenses the transfer.
 
-In each case, the collapse has the same form: a projected object is treated as if it had the role or authority of a richer object. A representation is treated as the world, a partial reasoning state as a conclusion, or one admissible model as the uniquely supported model. This makes projection loss invisible because the system can no longer track which distinctions were removed at which stage.
+In each case, the collapse has the same form: a projected object inherits a stronger dependency status than the representation licenses. A representation is treated as the world, a proxy as the target, a pointer as source support, a partial reasoning state as a conclusion, a selected explanation as uniquely determined, or a local component judgment as a composed-system judgment. This makes projection loss invisible because the system can no longer track which dependency status belongs to which level.
 
 These distinctions may coincide in specific cases, but they are not equivalent in general. Collapsing them prematurely removes the ability to track where information originates and how conclusions are derived.
 
